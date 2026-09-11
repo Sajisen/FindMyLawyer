@@ -7,7 +7,7 @@ export async function searchLawyers(filters) {
 
   if (filters.category) {
     params.set(
-      "categories",
+      "practiceArea",
       filters.category
     );
   }

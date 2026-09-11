@@ -91,36 +91,34 @@ export default function FindLawyersPage() {
     }
   }, [searchParams]);
 
-  async function handleManualSearch() {
-    try {
-      setLoading(true);
-      setError("");
+async function handleManualSearch() {
+  try {
+    setLoading(true);
+    setError("");
+    setHasSearched(true);
 
-      const data =
-        await searchLawyers(filters);
+    const data =
+      await searchLawyers(filters);
 
-      setLawyers(
-        data.lawyers || []
-      );
+    setLawyers(
+      data.lawyers || []
+    );
 
-      setResultCount(
-        data.count || 0
-      );
+    setResultCount(
+      data.count || 0
+    );
+  } catch (err) {
+    setLawyers([]);
+    setResultCount(0);
 
-      setHasSearched(true);
-    } catch (err) {
-      setLawyers([]);
-      setResultCount(0);
-      setHasSearched(true);
-
-      setError(
-        err.message ||
-          "Something went wrong while searching."
-      );
-    } finally {
-      setLoading(false);
-    }
+    setError(
+      err.message ||
+        "Something went wrong while searching."
+    );
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <main className="min-h-screen bg-brand-background">
@@ -308,7 +306,7 @@ export default function FindLawyersPage() {
                     {lawyers.map(
                       (lawyer) => (
                         <LawyerCard
-                          key={lawyer.id}
+                          key={lawyer._id}
                           lawyer={lawyer}
                         />
                       )

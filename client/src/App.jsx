@@ -7,6 +7,8 @@ import HomePage from "./pages/HomePage.jsx";
 import FindLawyersPage from "./pages/FindLawyersPage.jsx";
 import RegisterLawyerPage from "./pages/RegisterLawyerPage.jsx";
 
+import RegisterPage from "./pages/RegisterPage.jsx";
+
 function App() {
   return (
     <>
@@ -21,6 +23,11 @@ function App() {
         <Route
           path="/find-lawyers"
           element={<FindLawyersPage />}
+        />
+
+        <Route
+          path="/register"
+          element={<RegisterPage />}
         />
 
         <Route
