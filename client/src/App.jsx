@@ -2,10 +2,15 @@ import { Route, Routes } from "react-router-dom";
 
 import Navbar from "./components/layout/Navbar.jsx";
 import Footer from "./components/layout/Footer.jsx";
+import LawyerDashboardPage from "./pages/lawyer/LawyerDashboardPage.jsx";
+import EditLawyerProfilePage from "./pages/lawyer/EditLawyerProfilePage.jsx";
 
 import HomePage from "./pages/HomePage.jsx";
 import FindLawyersPage from "./pages/FindLawyersPage.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
 import RegisterLawyerPage from "./pages/RegisterLawyerPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 
 function App() {
   return (
@@ -24,9 +29,47 @@ function App() {
         />
 
         <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="/register"
+          element={<RegisterPage />}
+        />
+
+  <Route
+   path="/lawyer"
+    element={<LawyerDashboardPage />}
+  />
+        <Route
           path="/register-lawyer"
           element={<RegisterLawyerPage />}
         />
+
+        <Route
+  path="/lawyer/edit-profile"
+  element={<EditLawyerProfilePage />}
+/>
+
+<Route
+  path="/lawyer"
+  element={
+    <ProtectedRoute roles={["lawyer"]}>
+      <LawyerDashboardPage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/lawyer/edit-profile"
+  element={
+    <ProtectedRoute roles={["lawyer"]}>
+      <EditLawyerProfilePage />
+    </ProtectedRoute>
+  }
+/>
+        
       </Routes>
 
       <Footer />
