@@ -11,6 +11,8 @@ import {
 export default function ManualSearchPanel({
   filters,
   setFilters,
+  onSearch,
+  loading,
 }) {
   const [showMoreFilters, setShowMoreFilters] =
     useState(false);
@@ -22,11 +24,15 @@ export default function ManualSearchPanel({
     }));
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
+    function handleSubmit(event) {
+        event.preventDefault();
 
-    // Backend search will be connected next.
-  }
+        if (!filters.category) {
+            return;
+        }
+
+        onSearch();
+    }
 
   return (
     <form
@@ -227,12 +233,15 @@ export default function ManualSearchPanel({
         </div>
       )}
 
-      <button
-        type="submit"
-        className="mt-6 flex h-12 w-full items-center justify-center rounded-xl bg-brand-yellow px-5 text-sm font-bold text-brand-black transition hover:bg-brand-yellow-dark"
-      >
-        Find Lawyers
-      </button>
+          <button
+              type="submit"
+              disabled={loading || !filters.category}
+              className="mt-6 flex h-12 w-full items-center justify-center rounded-xl bg-brand-yellow px-5 text-sm font-bold text-brand-black transition hover:bg-brand-yellow-dark disabled:cursor-not-allowed disabled:opacity-50"
+          >
+              {loading
+                  ? "Finding Lawyers..."
+                  : "Find Lawyers"}
+          </button>
     </form>
   );
 }
