@@ -7,10 +7,12 @@ export async function connectDB() {
     });
 
     console.log(
-      `MongoDB connected: ${connection.connection.host}`
+      `MongoDB connected: ${connection.connection.name} @ ${connection.connection.host}`
     );
   } catch (error) {
     console.error("MongoDB connection failed:", error.message);
     process.exit(1);
   }
 }
+
+export default connectDB;
