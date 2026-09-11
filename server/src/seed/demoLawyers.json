@@ -1,0 +1,4079 @@
+[
+  {
+    "demoId": "LAW-DEMO-001",
+    "isDemo": true,
+    "displayName": "Udari Bandara",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law001@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Colombo",
+    "district": "Colombo",
+    "province": "Western",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 23,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-002",
+    "isDemo": true,
+    "displayName": "Harsha Pathirana",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law002@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Sri Jayawardenepura Kotte",
+    "district": "Colombo",
+    "province": "Western",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 21,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-003",
+    "isDemo": true,
+    "displayName": "Dineth Weerasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law003@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Dehiwala-Mount Lavinia",
+    "district": "Colombo",
+    "province": "Western",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 24,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-004",
+    "isDemo": true,
+    "displayName": "Nethmi Ranatunga",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law004@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Maharagama",
+    "district": "Colombo",
+    "province": "Western",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "finance"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Debt recovery",
+      "Banking disputes"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 7,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-005",
+    "isDemo": true,
+    "displayName": "Dhananjaya Gunawardena",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law005@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Gampaha",
+    "district": "Gampaha",
+    "province": "Western",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 14,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-006",
+    "isDemo": true,
+    "displayName": "Harsha Nanayakkara",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law006@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Negombo",
+    "district": "Gampaha",
+    "province": "Western",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 18,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-007",
+    "isDemo": true,
+    "displayName": "Kasun Gunawardena",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law007@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Wattala",
+    "district": "Gampaha",
+    "province": "Western",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 16,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-008",
+    "isDemo": true,
+    "displayName": "Dilani Nanayakkara",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law008@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Ja-Ela",
+    "district": "Gampaha",
+    "province": "Western",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "technology"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Trademarks",
+      "Copyright"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 8,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-009",
+    "isDemo": true,
+    "displayName": "Sanduni Pathirana",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law009@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kalutara",
+    "district": "Kalutara",
+    "province": "Western",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 12,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-010",
+    "isDemo": true,
+    "displayName": "Nadeesha Wickramasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law010@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Panadura",
+    "district": "Kalutara",
+    "province": "Western",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 9,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-011",
+    "isDemo": true,
+    "displayName": "Ravindu Senanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law011@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Horana",
+    "district": "Kalutara",
+    "province": "Western",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 18,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-012",
+    "isDemo": true,
+    "displayName": "Dilani Gunawardena",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law012@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Beruwala",
+    "district": "Kalutara",
+    "province": "Western",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "public"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Fundamental rights",
+      "Administrative decisions"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 15,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-013",
+    "isDemo": true,
+    "displayName": "Dhananjaya Karunaratne",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law013@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kandy",
+    "district": "Kandy",
+    "province": "Central",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 20,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-014",
+    "isDemo": true,
+    "displayName": "Kasun Senanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law014@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Peradeniya",
+    "district": "Kandy",
+    "province": "Central",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 14,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-015",
+    "isDemo": true,
+    "displayName": "Piumi Senanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law015@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Gampola",
+    "district": "Kandy",
+    "province": "Central",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 9,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-016",
+    "isDemo": true,
+    "displayName": "Kaushalya Weerasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law016@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Katugastota",
+    "district": "Kandy",
+    "province": "Central",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "immigration"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Visa matters",
+      "Citizenship"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 23,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-017",
+    "isDemo": true,
+    "displayName": "Senuri Weerasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law017@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Matale",
+    "district": "Matale",
+    "province": "Central",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 12,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-018",
+    "isDemo": true,
+    "displayName": "Shenali Hettiarachchi",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law018@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Dambulla",
+    "district": "Matale",
+    "province": "Central",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 7,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-019",
+    "isDemo": true,
+    "displayName": "Dineth Silva",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law019@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Galewela",
+    "district": "Matale",
+    "province": "Central",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 22,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-020",
+    "isDemo": true,
+    "displayName": "Thilina Senanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law020@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Ukuwela",
+    "district": "Matale",
+    "province": "Central",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "finance"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Debt recovery",
+      "Banking disputes"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 15,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-021",
+    "isDemo": true,
+    "displayName": "Praveen Rajapaksha",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law021@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Nuwara Eliya",
+    "district": "Nuwara Eliya",
+    "province": "Central",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 11,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-022",
+    "isDemo": true,
+    "displayName": "Janani Rajendran",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law022@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Hatton",
+    "district": "Nuwara Eliya",
+    "province": "Central",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 14,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-023",
+    "isDemo": true,
+    "displayName": "Ashan Wijesinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law023@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Talawakele",
+    "district": "Nuwara Eliya",
+    "province": "Central",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 20,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-024",
+    "isDemo": true,
+    "displayName": "Thivya Nadarajah",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law024@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Ginigathhena",
+    "district": "Nuwara Eliya",
+    "province": "Central",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "technology"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Trademarks",
+      "Copyright"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 22,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-025",
+    "isDemo": true,
+    "displayName": "Sahan Rajapaksha",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law025@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Galle",
+    "district": "Galle",
+    "province": "Southern",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 13,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-026",
+    "isDemo": true,
+    "displayName": "Ravindu Perera",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law026@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Ambalangoda",
+    "district": "Galle",
+    "province": "Southern",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 19,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-027",
+    "isDemo": true,
+    "displayName": "Kaushalya Wickramasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law027@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Hikkaduwa",
+    "district": "Galle",
+    "province": "Southern",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 5,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-028",
+    "isDemo": true,
+    "displayName": "Kaushalya Nanayakkara",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law028@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Elpitiya",
+    "district": "Galle",
+    "province": "Southern",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "public"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Fundamental rights",
+      "Administrative decisions"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 22,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-029",
+    "isDemo": true,
+    "displayName": "Nadeesha Pathirana",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law029@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Matara",
+    "district": "Matara",
+    "province": "Southern",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 22,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-030",
+    "isDemo": true,
+    "displayName": "Senuri Karunaratne",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law030@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Weligama",
+    "district": "Matara",
+    "province": "Southern",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 3,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-031",
+    "isDemo": true,
+    "displayName": "Dilani Weerasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law031@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Akuressa",
+    "district": "Matara",
+    "province": "Southern",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 2,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-032",
+    "isDemo": true,
+    "displayName": "Kavindu Jayasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law032@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Dikwella",
+    "district": "Matara",
+    "province": "Southern",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "immigration"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Visa matters",
+      "Citizenship"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 23,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-033",
+    "isDemo": true,
+    "displayName": "Isuru Perera",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law033@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Hambantota",
+    "district": "Hambantota",
+    "province": "Southern",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 23,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-034",
+    "isDemo": true,
+    "displayName": "Ashan Nanayakkara",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law034@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Tangalle",
+    "district": "Hambantota",
+    "province": "Southern",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 11,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-035",
+    "isDemo": true,
+    "displayName": "Lahiru Wickramasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law035@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Tissamaharama",
+    "district": "Hambantota",
+    "province": "Southern",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 11,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-036",
+    "isDemo": true,
+    "displayName": "Kasun Hettiarachchi",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law036@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Ambalantota",
+    "district": "Hambantota",
+    "province": "Southern",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "finance"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Debt recovery",
+      "Banking disputes"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 24,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-037",
+    "isDemo": true,
+    "displayName": "Krishan Sivakumar",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law037@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Jaffna",
+    "district": "Jaffna",
+    "province": "Northern",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 24,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-038",
+    "isDemo": true,
+    "displayName": "Vithushan Mahendran",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law038@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Nallur",
+    "district": "Jaffna",
+    "province": "Northern",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 11,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-039",
+    "isDemo": true,
+    "displayName": "Harini Mahendran",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law039@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Chavakachcheri",
+    "district": "Jaffna",
+    "province": "Northern",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 7,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-040",
+    "isDemo": true,
+    "displayName": "Janani Ravindran",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law040@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Point Pedro",
+    "district": "Jaffna",
+    "province": "Northern",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "technology"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Trademarks",
+      "Copyright"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 7,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-041",
+    "isDemo": true,
+    "displayName": "Sutharsan Sivarajah",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law041@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kilinochchi",
+    "district": "Kilinochchi",
+    "province": "Northern",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 17,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-042",
+    "isDemo": true,
+    "displayName": "Keerthana Ravindran",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law042@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Paranthan",
+    "district": "Kilinochchi",
+    "province": "Northern",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 20,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-043",
+    "isDemo": true,
+    "displayName": "Raveendran Mahendran",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law043@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Pallai",
+    "district": "Kilinochchi",
+    "province": "Northern",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 21,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-044",
+    "isDemo": true,
+    "displayName": "Sanjeev Jeyakumar",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law044@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Poonakary",
+    "district": "Kilinochchi",
+    "province": "Northern",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "public"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Fundamental rights",
+      "Administrative decisions"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 7,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-045",
+    "isDemo": true,
+    "displayName": "Mathumitha Mahendran",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law045@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Mannar",
+    "district": "Mannar",
+    "province": "Northern",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 12,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-046",
+    "isDemo": true,
+    "displayName": "Yalini Thiruchelvam",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law046@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Pesalai",
+    "district": "Mannar",
+    "province": "Northern",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 20,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-047",
+    "isDemo": true,
+    "displayName": "Sutharsan Rajendran",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law047@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Murunkan",
+    "district": "Mannar",
+    "province": "Northern",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 4,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-048",
+    "isDemo": true,
+    "displayName": "Sanjeev Sivapalan",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law048@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Talaimannar",
+    "district": "Mannar",
+    "province": "Northern",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "immigration"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Visa matters",
+      "Citizenship"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 16,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-049",
+    "isDemo": true,
+    "displayName": "Keerthana Kandasamy",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law049@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Vavuniya",
+    "district": "Vavuniya",
+    "province": "Northern",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 7,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-050",
+    "isDemo": true,
+    "displayName": "Tharshan Rajendran",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law050@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Omanthai",
+    "district": "Vavuniya",
+    "province": "Northern",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 15,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-051",
+    "isDemo": true,
+    "displayName": "Sharmila Sivarajah",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law051@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Cheddikulam",
+    "district": "Vavuniya",
+    "province": "Northern",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 3,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-052",
+    "isDemo": true,
+    "displayName": "Krishan Ravindran",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law052@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Nedunkeni",
+    "district": "Vavuniya",
+    "province": "Northern",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "finance"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Debt recovery",
+      "Banking disputes"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 8,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-053",
+    "isDemo": true,
+    "displayName": "Piratheep Navaratnam",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law053@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Mullaitivu",
+    "district": "Mullaitivu",
+    "province": "Northern",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 24,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-054",
+    "isDemo": true,
+    "displayName": "Harini Arulanantham",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law054@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Puthukkudiyiruppu",
+    "district": "Mullaitivu",
+    "province": "Northern",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 9,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-055",
+    "isDemo": true,
+    "displayName": "Sutharsan Balendran",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law055@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Mankulam",
+    "district": "Mullaitivu",
+    "province": "Northern",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 3,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-056",
+    "isDemo": true,
+    "displayName": "Niroshan Navaratnam",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law056@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Oddusuddan",
+    "district": "Mullaitivu",
+    "province": "Northern",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "technology"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Trademarks",
+      "Copyright"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 3,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-057",
+    "isDemo": true,
+    "displayName": "Nusra Ismail",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law057@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Batticaloa",
+    "district": "Batticaloa",
+    "province": "Eastern",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 2,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-058",
+    "isDemo": true,
+    "displayName": "Arulnithi Tharmalingam",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law058@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kattankudy",
+    "district": "Batticaloa",
+    "province": "Eastern",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 18,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-059",
+    "isDemo": true,
+    "displayName": "Chamara Perera",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law059@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Eravur",
+    "district": "Batticaloa",
+    "province": "Eastern",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 4,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-060",
+    "isDemo": true,
+    "displayName": "Fazil Rauff",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law060@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Valaichchenai",
+    "district": "Batticaloa",
+    "province": "Eastern",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "public"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Fundamental rights",
+      "Administrative decisions"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 7,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-061",
+    "isDemo": true,
+    "displayName": "Safiya Hassan",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law061@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Ampara",
+    "district": "Ampara",
+    "province": "Eastern",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 11,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-062",
+    "isDemo": true,
+    "displayName": "Thivya Kanagaratnam",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law062@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kalmunai",
+    "district": "Ampara",
+    "province": "Eastern",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 7,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-063",
+    "isDemo": true,
+    "displayName": "Nimesh Pathirana",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law063@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Akkaraipattu",
+    "district": "Ampara",
+    "province": "Eastern",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 2,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-064",
+    "isDemo": true,
+    "displayName": "Fathima Ismail",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law064@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Sammanthurai",
+    "district": "Ampara",
+    "province": "Eastern",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "immigration"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Visa matters",
+      "Citizenship"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 12,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-065",
+    "isDemo": true,
+    "displayName": "Safiya Hameed",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law065@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Trincomalee",
+    "district": "Trincomalee",
+    "province": "Eastern",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 18,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-066",
+    "isDemo": true,
+    "displayName": "Janani Jeyakumar",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law066@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kinniya",
+    "district": "Trincomalee",
+    "province": "Eastern",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Tamil",
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 4,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-067",
+    "isDemo": true,
+    "displayName": "Kasun Nanayakkara",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law067@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kantale",
+    "district": "Trincomalee",
+    "province": "Eastern",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 4,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-068",
+    "isDemo": true,
+    "displayName": "Nazeer Jiffry",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law068@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Muttur",
+    "district": "Trincomalee",
+    "province": "Eastern",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "finance"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Debt recovery",
+      "Banking disputes"
+    ],
+    "languages": [
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 11,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-069",
+    "isDemo": true,
+    "displayName": "Praveen Bandara",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law069@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kurunegala",
+    "district": "Kurunegala",
+    "province": "North Western",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 3,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-070",
+    "isDemo": true,
+    "displayName": "Kaushalya Dissanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law070@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kuliyapitiya",
+    "district": "Kurunegala",
+    "province": "North Western",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 17,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-071",
+    "isDemo": true,
+    "displayName": "Dilani Senanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law071@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Narammala",
+    "district": "Kurunegala",
+    "province": "North Western",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 10,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-072",
+    "isDemo": true,
+    "displayName": "Senuri Samarasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law072@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Pannala",
+    "district": "Kurunegala",
+    "province": "North Western",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "technology"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Trademarks",
+      "Copyright"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 15,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-073",
+    "isDemo": true,
+    "displayName": "Shenali Rajapaksha",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law073@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Puttalam",
+    "district": "Puttalam",
+    "province": "North Western",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 17,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-074",
+    "isDemo": true,
+    "displayName": "Mifraz Hameed",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law074@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Chilaw",
+    "district": "Puttalam",
+    "province": "North Western",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 7,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-075",
+    "isDemo": true,
+    "displayName": "Dilani Jayasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law075@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Wennappuwa",
+    "district": "Puttalam",
+    "province": "North Western",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 21,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-076",
+    "isDemo": true,
+    "displayName": "Imran Hameed",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law076@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Marawila",
+    "district": "Puttalam",
+    "province": "North Western",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "public"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Fundamental rights",
+      "Administrative decisions"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 5,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-077",
+    "isDemo": true,
+    "displayName": "Nethmi Rajapaksha",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law077@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Anuradhapura",
+    "district": "Anuradhapura",
+    "province": "North Central",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 5,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-078",
+    "isDemo": true,
+    "displayName": "Dilani Ekanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law078@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kekirawa",
+    "district": "Anuradhapura",
+    "province": "North Central",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 8,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-079",
+    "isDemo": true,
+    "displayName": "Madushi Pathirana",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law079@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Medawachchiya",
+    "district": "Anuradhapura",
+    "province": "North Central",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 24,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-080",
+    "isDemo": true,
+    "displayName": "Sanduni Ranatunga",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law080@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Tambuttegama",
+    "district": "Anuradhapura",
+    "province": "North Central",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "immigration"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Visa matters",
+      "Citizenship"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 17,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-081",
+    "isDemo": true,
+    "displayName": "Praveen Weerasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law081@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Polonnaruwa",
+    "district": "Polonnaruwa",
+    "province": "North Central",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 14,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-082",
+    "isDemo": true,
+    "displayName": "Lahiru Dissanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law082@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kaduruwela",
+    "district": "Polonnaruwa",
+    "province": "North Central",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 24,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-083",
+    "isDemo": true,
+    "displayName": "Gayan Samarasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law083@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Hingurakgoda",
+    "district": "Polonnaruwa",
+    "province": "North Central",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 11,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-084",
+    "isDemo": true,
+    "displayName": "Senuri Hettiarachchi",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law084@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Medirigiriya",
+    "district": "Polonnaruwa",
+    "province": "North Central",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "finance"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Debt recovery",
+      "Banking disputes"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 2,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-085",
+    "isDemo": true,
+    "displayName": "Shenali Pathirana",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law085@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Badulla",
+    "district": "Badulla",
+    "province": "Uva",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 17,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-086",
+    "isDemo": true,
+    "displayName": "Harsha Abeysekara",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law086@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Bandarawela",
+    "district": "Badulla",
+    "province": "Uva",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 4,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-087",
+    "isDemo": true,
+    "displayName": "Sanduni Senanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law087@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Welimada",
+    "district": "Badulla",
+    "province": "Uva",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 13,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-088",
+    "isDemo": true,
+    "displayName": "Madushi Ranatunga",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law088@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Mahiyanganaya",
+    "district": "Badulla",
+    "province": "Uva",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "technology"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Trademarks",
+      "Copyright"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 23,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-089",
+    "isDemo": true,
+    "displayName": "Piumi Dissanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law089@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Monaragala",
+    "district": "Monaragala",
+    "province": "Uva",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 14,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-090",
+    "isDemo": true,
+    "displayName": "Kasun Weerasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law090@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Wellawaya",
+    "district": "Monaragala",
+    "province": "Uva",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 6,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-091",
+    "isDemo": true,
+    "displayName": "Harsha Perera",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law091@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Bibile",
+    "district": "Monaragala",
+    "province": "Uva",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 12,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-092",
+    "isDemo": true,
+    "displayName": "Kavindu Weerasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law092@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Buttala",
+    "district": "Monaragala",
+    "province": "Uva",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "public"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Fundamental rights",
+      "Administrative decisions"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 5,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-093",
+    "isDemo": true,
+    "displayName": "Nethmi Dissanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law093@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Ratnapura",
+    "district": "Ratnapura",
+    "province": "Sabaragamuwa",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 10,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-094",
+    "isDemo": true,
+    "displayName": "Nethmi Fernando",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law094@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Balangoda",
+    "district": "Ratnapura",
+    "province": "Sabaragamuwa",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 12,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-095",
+    "isDemo": true,
+    "displayName": "Dineth Fernando",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law095@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Embilipitiya",
+    "district": "Ratnapura",
+    "province": "Sabaragamuwa",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 12,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-096",
+    "isDemo": true,
+    "displayName": "Madushi Samarasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law096@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Eheliyagoda",
+    "district": "Ratnapura",
+    "province": "Sabaragamuwa",
+    "primaryPracticeArea": "employment",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "immigration"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Visa matters",
+      "Citizenship"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 24,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-097",
+    "isDemo": true,
+    "displayName": "Lahiru Senanayake",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law097@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Kegalle",
+    "district": "Kegalle",
+    "province": "Sabaragamuwa",
+    "primaryPracticeArea": "property",
+    "practiceAreas": [
+      "property",
+      "civil"
+    ],
+    "subAreas": [
+      "Land ownership disputes",
+      "Boundary disputes",
+      "Partition matters",
+      "Property transfers"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 23,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-098",
+    "isDemo": true,
+    "displayName": "Nimesh Jayasinghe",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law098@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Mawanella",
+    "district": "Kegalle",
+    "province": "Sabaragamuwa",
+    "primaryPracticeArea": "family",
+    "practiceAreas": [
+      "family",
+      "inheritance"
+    ],
+    "subAreas": [
+      "Divorce and separation",
+      "Maintenance",
+      "Child custody",
+      "Wills and probate"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 2,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-099",
+    "isDemo": true,
+    "displayName": "Dinushi Abeysekara",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law099@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Warakapola",
+    "district": "Kegalle",
+    "province": "Sabaragamuwa",
+    "primaryPracticeArea": "criminal",
+    "practiceAreas": [
+      "criminal",
+      "civil"
+    ],
+    "subAreas": [
+      "Police and court matters",
+      "Bail",
+      "Criminal defence",
+      "Compensation claims"
+    ],
+    "languages": [
+      "Sinhala",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Online"
+    ],
+    "yearsOfPractice": 24,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": true,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  },
+  {
+    "demoId": "LAW-DEMO-100",
+    "isDemo": true,
+    "displayName": "Ashan Ranatunga",
+    "professionalTitle": "Attorney-at-Law",
+    "email": "demo.law100@example.com",
+    "phone": "+94 7X XXX XXXX",
+    "officeCity": "Ruwanwella",
+    "district": "Kegalle",
+    "province": "Sabaragamuwa",
+    "primaryPracticeArea": "business",
+    "practiceAreas": [
+      "business",
+      "employment",
+      "finance"
+    ],
+    "subAreas": [
+      "Business agreements",
+      "Company matters",
+      "Employment contracts",
+      "Workplace disputes",
+      "Debt recovery",
+      "Banking disputes"
+    ],
+    "languages": [
+      "Sinhala",
+      "Tamil",
+      "English"
+    ],
+    "consultationModes": [
+      "In Person",
+      "Telephone",
+      "Online"
+    ],
+    "yearsOfPractice": 11,
+    "description": "Fictional Attorney-at-Law profile created for prototype demonstration.",
+    "verificationStatus": "demo_verified",
+    "acceptingNewClients": false,
+    "subscription": {
+      "plan": "free",
+      "exposureLimit": 10,
+      "exposureUsed": 0
+    }
+  }
+]
