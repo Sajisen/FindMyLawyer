@@ -1,6 +1,6 @@
 import {
   apiRequest,
-} from "../../services/apiClient.js";
+} from "../../services/api.js";
 
 export async function searchLawyers(filters) {
   const params = new URLSearchParams();
