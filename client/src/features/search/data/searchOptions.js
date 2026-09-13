@@ -49,17 +49,9 @@ export const legalCategories = [
   },
 ];
 
-export const languages = [
-  "Sinhala",
-  "Tamil",
-  "English",
-];
+export const languages = ["Sinhala", "Tamil", "English"];
 
-export const consultationModes = [
-  "In Person",
-  "Online",
-  "Telephone",
-];
+export const consultationModes = ["In Person", "Online", "Telephone"];
 
 export const experienceOptions = [
   {
@@ -82,21 +74,4 @@ export const experienceOptions = [
     value: "10",
     label: "10+ years",
   },
-];
-
-/*
-  Temporary suggestions for the UI.
-
-  Later these should come from:
-  GET /api/meta/locations
-*/
-export const locationSuggestions = [
-  "Colombo",
-  "Panadura",
-  "Kalutara",
-  "Moratuwa",
-  "Negombo",
-  "Kandy",
-  "Galle",
-  "Jaffna",
 ];

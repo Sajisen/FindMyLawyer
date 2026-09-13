@@ -1,6 +1,11 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-const practiceAreas = [
+import SelectControl from "../components/ui/SelectControl.jsx";
+import LocationAutocomplete from "../features/search/components/LocationAutocomplete.jsx";
+import useLegalCategories from "../features/search/hooks/useLegalCategories.js";
+
+const featuredPracticeAreaDefaults = [
   {
     id: "property",
     name: "Land & Property",
@@ -40,46 +45,130 @@ const practiceAreas = [
 ];
 
 export default function HomePage() {
+  const navigate = useNavigate();
+  const { categories, loading: categoriesLoading, error: categoriesError } =
+    useLegalCategories();
+
+  const featuredPracticeAreas = featuredPracticeAreaDefaults
+    .map((area) => {
+      const configuredCategory = categories.find(
+        (category) => category.id === area.id
+      );
+
+      return {
+        ...area,
+        configured: Boolean(configuredCategory),
+        name: configuredCategory?.name || area.name,
+        description: configuredCategory?.description || area.description,
+      };
+    })
+    .filter(
+      (area) => categoriesLoading || categoriesError || area.configured
+    );
+
+  const [quickSearch, setQuickSearch] = useState({
+    category: "",
+    location: "",
+    locationId: "",
+  });
+
+  function updateQuickSearch(field, value) {
+    setQuickSearch((previous) => ({
+      ...previous,
+      [field]: value,
+    }));
+  }
+
+  function handleLocationChange(value) {
+    setQuickSearch((previous) => ({
+      ...previous,
+      location: value,
+      locationId: "",
+    }));
+  }
+
+  function handleLocationSelect(location) {
+    if (!location) {
+      return;
+    }
+
+    setQuickSearch((previous) => ({
+      ...previous,
+      location: location.city,
+      locationId: location.id,
+    }));
+  }
+
+  function handleQuickSearch(event) {
+    event.preventDefault();
+
+    const hasMainFilter = Boolean(
+      quickSearch.category || quickSearch.locationId
+    );
+    const hasUnselectedLocation = Boolean(
+      quickSearch.location.trim() && !quickSearch.locationId
+    );
+
+    if (!hasMainFilter || hasUnselectedLocation) {
+      return;
+    }
+
+    const params = new URLSearchParams({ search: "1" });
+
+    if (quickSearch.category) {
+      params.set("category", quickSearch.category);
+    }
+
+    if (quickSearch.locationId) {
+      params.set("location", quickSearch.location.trim());
+      params.set("locationId", quickSearch.locationId);
+    }
+
+    navigate(`/find-lawyers?${params.toString()}`);
+  }
+
+  const quickSearchHasMainFilter = Boolean(
+    quickSearch.category || quickSearch.locationId
+  );
+  const quickSearchHasUnselectedLocation = Boolean(
+    quickSearch.location.trim() && !quickSearch.locationId
+  );
+  const canQuickSearch =
+    quickSearchHasMainFilter && !quickSearchHasUnselectedLocation;
+
   return (
     <main>
-      {/* TOP BANNER */}
+      {/* NARROW SEARCH BANNER */}
       <section className="border-b border-yellow-200 bg-brand-yellow-soft">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-3 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-          <div>
-            <p className="text-sm font-semibold text-brand-black">
-              Not sure which type of legal help you need?
-            </p>
-
-            <p className="mt-0.5 text-sm text-brand-muted">
-              Start with a guided search and find a relevant area of practice.
-            </p>
-          </div>
+          <p className="text-sm font-medium text-brand-black">
+            Search lawyer profiles by legal area and preferred location.
+          </p>
 
           <Link
             to="/find-lawyers"
             className="w-fit shrink-0 text-sm font-bold text-brand-black transition hover:underline"
           >
-            Start Search
+            Browse lawyers →
           </Link>
         </div>
       </section>
 
       {/* HERO */}
-      <section className="overflow-hidden bg-white">
+      <section className="overflow-visible bg-white">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:px-8 lg:py-24">
-          {/* Hero Content */}
           <div className="max-w-2xl">
-            <h1 className="text-4xl font-extrabold tracking-tight text-brand-black sm:text-5xl lg:text-6xl lg:leading-[1.08]">
-              Find the legal help{" "}
-              <span className="relative inline-block">
-                you need
-                <span className="absolute bottom-1 left-0 -z-10 h-3 w-full bg-brand-yellow sm:h-4" />
-              </span>
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-[#806600]">
+              Lawyer discovery in Sri Lanka
+            </p>
+
+            <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-brand-black sm:text-5xl lg:text-6xl lg:leading-[1.08]">
+              Find the legal help you need
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-8 text-brand-muted sm:text-lg">
-              Search for Attorneys-at-Law by area of practice and preferred
-              location, then explore profiles relevant to your needs.
+              Search Attorneys-at-Law by area of practice and location, then
+              review profiles that match your preferences.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -97,143 +186,125 @@ export default function HomePage() {
                 How It Works
               </a>
             </div>
-
-            <div className="mt-9 flex flex-wrap gap-x-7 gap-y-3 text-sm text-brand-muted">
-              <span>✓ Search by practice area</span>
-              <span>✓ Choose your location</span>
-              <span>✓ Explore relevant profiles</span>
-            </div>
           </div>
 
-          {/* Search Preview */}
+          {/* QUICK SEARCH */}
           <div className="mx-auto w-full max-w-lg">
-            <div className="rounded-3xl border border-brand-border bg-white p-6 shadow-xl shadow-black/5 sm:p-8">
-              <div className="border-b border-brand-border pb-5">
+            <form
+              onSubmit={handleQuickSearch}
+              className="rounded-3xl border border-brand-border bg-white p-6 shadow-xl shadow-black/5 sm:p-8"
+            >
+              <div>
                 <p className="text-sm font-medium text-brand-muted">
-                  Lawyer Search
+                  Quick Search
                 </p>
 
                 <h2 className="mt-1 text-2xl font-extrabold text-brand-black">
-                  Find legal assistance
+                  Start with what you know
                 </h2>
               </div>
 
               <div className="mt-6">
-                <label className="mb-2 block text-sm font-semibold text-brand-black">
+                <label
+                  htmlFor="home-practice-area"
+                  className="mb-2 block text-sm font-semibold text-brand-black"
+                >
                   Area of Practice
                 </label>
 
-                <div className="flex min-h-14 items-center justify-between rounded-xl border border-brand-border bg-brand-background px-4">
-                  <span className="text-sm text-brand-black">
-                    Land, Property & Notarial Matters
-                  </span>
+                <SelectControl
+                  id="home-practice-area"
+                  value={quickSearch.category}
+                  onChange={(event) =>
+                    updateQuickSearch("category", event.target.value)
+                  }
+                >
+                  <option value="">Select an area, or use location below</option>
 
-                  <span className="text-brand-muted">
-                    ▾
-                  </span>
-                </div>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </SelectControl>
               </div>
 
               <div className="mt-5">
-                <label className="mb-2 block text-sm font-semibold text-brand-black">
+                <label
+                  htmlFor="home-location"
+                  className="mb-2 block text-sm font-semibold text-brand-black"
+                >
                   Preferred Location
+                  <span className="ml-1 font-normal text-brand-muted">
+                    (optional)
+                  </span>
                 </label>
 
-                <div className="flex min-h-14 items-center justify-between rounded-xl border border-brand-border bg-brand-background px-4">
-                  <span className="text-sm text-brand-black">
-                    Panadura
-                  </span>
+                <LocationAutocomplete
+                  id="home-location"
+                  value={quickSearch.location}
+                  onChange={handleLocationChange}
+                  onSelect={handleLocationSelect}
+                  placeholder="Start typing a city"
+                />
 
-                  <span className="text-brand-muted">
-                    ▾
-                  </span>
-                </div>
+                {quickSearchHasUnselectedLocation && (
+                  <p className="mt-2 text-xs leading-5 text-amber-700">
+                    Select a location from the suggestions to use it.
+                  </p>
+                )}
               </div>
 
-              <Link
-                to="/find-lawyers"
-                className="mt-6 flex min-h-13 items-center justify-center rounded-xl bg-brand-black px-5 font-bold text-white transition hover:bg-brand-dark"
+              <button
+                type="submit"
+                disabled={!canQuickSearch}
+                className="mt-6 flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-yellow px-5 font-bold text-brand-black transition hover:bg-brand-yellow-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow-dark/40 disabled:cursor-not-allowed disabled:opacity-45"
               >
-                Find Matching Lawyers
-              </Link>
+                Search Lawyers
+              </button>
 
-              <div className="mt-6 rounded-xl border border-brand-border bg-brand-background p-4">
-                <p className="text-sm font-semibold text-brand-black">
-                  Not sure which area of practice to choose?
-                </p>
-
-                <p className="mt-1 text-sm leading-6 text-brand-muted">
-                  Start your search and we&apos;ll help you narrow down a
-                  relevant category.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SIMPLE BENEFITS */}
-      <section className="border-y border-brand-border bg-brand-background">
-        <div className="mx-auto grid max-w-7xl px-5 sm:grid-cols-3 sm:px-6 lg:px-8">
-          <div className="border-b border-brand-border py-6 sm:border-b-0 sm:border-r sm:pr-8">
-            <h3 className="font-bold text-brand-black">
-              Search by legal need
-            </h3>
-
-            <p className="mt-1 text-sm leading-6 text-brand-muted">
-              Begin with a relevant area of practice.
-            </p>
-          </div>
-
-          <div className="border-b border-brand-border py-6 sm:border-b-0 sm:border-r sm:px-8">
-            <h3 className="font-bold text-brand-black">
-              Choose your location
-            </h3>
-
-            <p className="mt-1 text-sm leading-6 text-brand-muted">
-              Find profiles based on where you prefer assistance.
-            </p>
-          </div>
-
-          <div className="py-6 sm:pl-8">
-            <h3 className="font-bold text-brand-black">
-              Compare profiles clearly
-            </h3>
-
-            <p className="mt-1 text-sm leading-6 text-brand-muted">
-              Review useful profile information before proceeding.
-            </p>
+            </form>
           </div>
         </div>
       </section>
 
       {/* PRACTICE AREAS */}
-      <section className="bg-white py-20 lg:py-24">
+      <section className="border-t border-brand-border bg-brand-background py-20 lg:py-24">
         <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-[#806600]">
-              Areas of Practice
+              Common legal areas
             </p>
 
             <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-brand-black sm:text-4xl">
-              Start with the legal help you need
+              Browse by area of practice
             </h2>
 
             <p className="mt-4 text-base leading-7 text-brand-muted sm:text-lg">
-              Explore commonly searched areas of practice available through
-              FindMyLawyer.
+              Choose a category to open Find Lawyers with that filter already
+              applied and the matching profiles loaded.
             </p>
           </div>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {practiceAreas.map((area) => (
+            {featuredPracticeAreas.map((area) => (
               <Link
-                to={`/find-lawyers?category=${area.id}`}
+                to={`/find-lawyers?category=${area.id}&search=1`}
                 key={area.id}
+                className="group rounded-2xl border border-brand-border bg-white p-6 transition hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-lg hover:shadow-black/5 focus:outline-none focus:ring-2 focus:ring-brand-yellow-dark/40"
               >
-                <div className="mb-5 h-1 w-10 rounded-full bg-brand-yellow" />
+                <div className="flex items-start justify-between gap-4">
+                  <div className="h-1 w-10 rounded-full bg-brand-yellow" />
 
-                <h3 className="text-lg font-bold text-brand-black">
+                  <span
+                    aria-hidden="true"
+                    className="text-lg text-brand-muted transition group-hover:translate-x-1 group-hover:text-brand-black"
+                  >
+                    →
+                  </span>
+                </div>
+
+                <h3 className="mt-5 text-lg font-bold text-brand-black">
                   {area.name}
                 </h3>
 
@@ -258,57 +329,34 @@ export default function HomePage() {
             </p>
 
             <h2 className="mt-4 text-3xl font-extrabold sm:text-4xl">
-              A straightforward way to begin
+              From search to a useful profile
             </h2>
-
-            <p className="mt-4 text-base leading-7 text-neutral-400 sm:text-lg">
-              FindMyLawyer keeps the search process simple and easy to
-              understand.
-            </p>
           </div>
 
           <div className="mt-12 grid gap-10 md:grid-cols-3">
             <article>
-              <div className="text-sm font-extrabold text-brand-yellow">
-                01
-              </div>
-
-              <h3 className="mt-4 text-xl font-bold">
-                Choose what you need
-              </h3>
-
+              <div className="text-sm font-extrabold text-brand-yellow">01</div>
+              <h3 className="mt-4 text-xl font-bold">Choose a starting point</h3>
               <p className="mt-3 leading-7 text-neutral-400">
-                Select an area of practice or begin with a guided search when
-                you are unsure.
+                Start with an area of practice, a preferred location, or both.
               </p>
             </article>
 
             <article>
-              <div className="text-sm font-extrabold text-brand-yellow">
-                02
-              </div>
-
-              <h3 className="mt-4 text-xl font-bold">
-                Select your location
-              </h3>
-
+              <div className="text-sm font-extrabold text-brand-yellow">02</div>
+              <h3 className="mt-4 text-xl font-bold">Add your preferences</h3>
               <p className="mt-3 leading-7 text-neutral-400">
-                Choose where you would prefer to find legal assistance.
+                Refine the results by language, consultation method or minimum
+                experience when useful.
               </p>
             </article>
 
             <article>
-              <div className="text-sm font-extrabold text-brand-yellow">
-                03
-              </div>
-
-              <h3 className="mt-4 text-xl font-bold">
-                Explore profiles
-              </h3>
-
+              <div className="text-sm font-extrabold text-brand-yellow">03</div>
+              <h3 className="mt-4 text-xl font-bold">Review profiles</h3>
               <p className="mt-3 leading-7 text-neutral-400">
-                Review matching profiles and decide which ones you want to
-                explore further.
+                Compare relevant public profile information and decide who you
+                want to contact.
               </p>
             </article>
           </div>
@@ -316,10 +364,7 @@ export default function HomePage() {
       </section>
 
       {/* ABOUT */}
-      <section
-        id="about"
-        className="bg-white py-20 lg:py-24"
-      >
+      <section id="about" className="bg-white py-20 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:px-8">
           <div>
             <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-[#806600]">
@@ -333,17 +378,12 @@ export default function HomePage() {
 
           <div className="space-y-5 text-base leading-8 text-brand-muted sm:text-lg">
             <p>
-              FindMyLawyer is a Sri Lankan lawyer-discovery platform designed
-              to make it easier to begin searching for legal assistance.
+              FindMyLawyer is a Sri Lankan lawyer-discovery prototype designed
+              to make the first step of searching for legal assistance easier.
             </p>
 
             <p>
-              Users can search based on areas of practice, preferred location
-              and other relevant preferences before reviewing lawyer profiles.
-            </p>
-
-            <p>
-              The platform helps with discovery and routing. It does not
+              The platform supports lawyer discovery and routing. It does not
               replace professional legal advice.
             </p>
           </div>
@@ -356,30 +396,20 @@ export default function HomePage() {
           <div className="rounded-3xl bg-brand-yellow px-7 py-10 sm:px-10 lg:flex lg:items-center lg:justify-between lg:px-12">
             <div className="max-w-2xl">
               <h2 className="text-3xl font-extrabold tracking-tight text-brand-black">
-                Ready to begin your search?
+                Ready to search?
               </h2>
 
               <p className="mt-3 leading-7 text-black/70">
-                Choose the legal help you need and explore relevant lawyer
-                profiles.
+                Choose a legal area and explore relevant lawyer profiles.
               </p>
             </div>
 
-            <div className="mt-7 flex flex-wrap gap-3 lg:mt-0">
-              <Link
-                to="/register"
-                className="inline-flex min-h-12 items-center justify-center rounded-lg border border-black/20 px-5 font-bold text-brand-black transition hover:border-brand-black"
-              >
-                Register
-              </Link>
-
-              <Link
-                to="/find-lawyers"
-                className="inline-flex min-h-12 items-center justify-center rounded-lg bg-brand-black px-6 font-bold text-white transition hover:bg-brand-dark"
-              >
-                Find Lawyers
-              </Link>
-            </div>
+            <Link
+              to="/find-lawyers"
+              className="mt-7 inline-flex min-h-12 items-center justify-center rounded-lg bg-brand-black px-6 font-bold text-white transition hover:bg-brand-dark lg:mt-0"
+            >
+              Find Lawyers
+            </Link>
           </div>
         </div>
       </section>

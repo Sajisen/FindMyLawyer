@@ -2,11 +2,8 @@ import {
   legalCategories,
 } from "../../search/data/searchOptions.js";
 
-const categoryNames = Object.fromEntries(
-  legalCategories.map((category) => [
-    category.id,
-    category.name,
-  ])
+const fallbackCategoryNames = Object.fromEntries(
+  legalCategories.map((category) => [category.id, category.name])
 );
 
 function getInitials(name = "") {
@@ -19,9 +16,14 @@ function getInitials(name = "") {
     .toUpperCase();
 }
 
-export default function LawyerCard({
-  lawyer,
-}) {
+export default function LawyerCard({ lawyer, categories = [] }) {
+  const categoryNames = {
+    ...fallbackCategoryNames,
+    ...Object.fromEntries(
+      categories.map((category) => [category.id, category.name])
+    ),
+  };
+
   return (
     <article className="rounded-2xl border border-brand-border bg-white p-5 transition hover:border-neutral-300 hover:shadow-md hover:shadow-black/5 sm:p-6">
       <div className="flex flex-col gap-5 sm:flex-row">
