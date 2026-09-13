@@ -1,11 +1,45 @@
-import Lawyer from "./lawyer.model.js";
+import LawyerProfile from "../models/LawyerProfile.js";
+
+const PUBLIC_LAWYER_FIELDS = [
+  "displayName",
+  "professionalTitle",
+  "email",
+  "phone",
+  "officeCity",
+  "district",
+  "province",
+  "primaryPracticeArea",
+  "practiceAreas",
+  "subAreas",
+  "languages",
+  "consultationModes",
+  "yearsOfPractice",
+  "description",
+  "acceptingNewClients",
+].join(" ");
+
+const PUBLIC_VISIBILITY = {
+  $or: [
+    {
+      isDemo: true,
+      verificationStatus: "demo_verified",
+    },
+    {
+      isDemo: { $ne: true },
+      isPublished: true,
+    },
+  ],
+};
 
 function normalize(value = "") {
   return value.trim().toLowerCase();
 }
 
 function escapeRegex(value = "") {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return value.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&"
+  );
 }
 
 function offersOnlineConsultation(lawyer) {
@@ -16,23 +50,30 @@ function offersOnlineConsultation(lawyer) {
 
 function calculateCategoryScore(
   lawyer,
-  categories
+  practiceArea
 ) {
-  let score = 0;
-
-  for (const category of categories) {
-    if (
-      lawyer.primaryPracticeArea === category
-    ) {
-      score += 100;
-    } else if (
-      lawyer.practiceAreas?.includes(category)
-    ) {
-      score += 70;
-    }
+  if (!practiceArea) {
+    return 0;
   }
 
-  return score;
+  if (
+    normalize(lawyer.primaryPracticeArea) ===
+    normalize(practiceArea)
+  ) {
+    return 100;
+  }
+
+  if (
+    lawyer.practiceAreas?.some(
+      (area) =>
+        normalize(area) ===
+        normalize(practiceArea)
+    )
+  ) {
+    return 70;
+  }
+
+  return 0;
 }
 
 function calculateLocationMatch(
@@ -59,8 +100,8 @@ function calculateLocationMatch(
 
   if (
     locationContext?.district &&
-    lawyer.district ===
-      locationContext.district
+    normalize(lawyer.district) ===
+      normalize(locationContext.district)
   ) {
     return {
       score: 30,
@@ -70,8 +111,8 @@ function calculateLocationMatch(
 
   if (
     locationContext?.province &&
-    lawyer.province ===
-      locationContext.province
+    normalize(lawyer.province) ===
+      normalize(locationContext.province)
   ) {
     return {
       score: 15,
@@ -92,59 +133,90 @@ function calculateLocationMatch(
   };
 }
 
-export async function searchLawyers({
-  categories = [],
+export async function searchPublicLawyers({
+  practiceArea = "",
+  province = "",
+  district = "",
   city = "",
   language = "",
   consultationMode = "",
-  minExperience = 0,
-  limit = 20,
+  minExperience,
+  acceptingNewClients,
 }) {
-  const query = {
-    acceptingNewClients: true,
+  const conditions = [
+    PUBLIC_VISIBILITY,
+  ];
 
-    verificationStatus: {
-      $in: [
-        "verified",
-        "demo_verified",
+  if (practiceArea) {
+    conditions.push({
+      $or: [
+        {
+          primaryPracticeArea:
+            practiceArea,
+        },
+        {
+          practiceAreas:
+            practiceArea,
+        },
       ],
-    },
-  };
+    });
+  }
 
-  if (categories.length > 0) {
-    query.practiceAreas = {
-      $in: categories,
-    };
+  if (province) {
+    conditions.push({ province });
+  }
+
+  if (district) {
+    conditions.push({ district });
   }
 
   if (language) {
-    query.languages = language;
+    conditions.push({
+      languages: language,
+    });
   }
 
   if (consultationMode) {
-    query.consultationModes =
-      consultationMode;
+    conditions.push({
+      consultationModes:
+        consultationMode,
+    });
   }
 
-  if (minExperience > 0) {
-    query.yearsOfPractice = {
-      $gte: minExperience,
-    };
+  if (
+    minExperience !== undefined &&
+    minExperience !== ""
+  ) {
+    conditions.push({
+      yearsOfPractice: {
+        $gte: Number(minExperience),
+      },
+    });
+  }
+
+  if (
+    acceptingNewClients !== undefined
+  ) {
+    conditions.push({
+      acceptingNewClients,
+    });
   }
 
   /*
-    We intentionally don't filter by city here.
+    Do not filter candidates directly by city.
 
-    We need the wider result set so that we can
-    rank:
+    We need a wider set so we can rank:
     exact city
-    -> district
-    -> province
+    -> same district
+    -> same province
     -> online.
   */
-  const candidates = await Lawyer.find(
-    query
-  ).lean();
+  const candidates =
+    await LawyerProfile.find({
+      $and: conditions,
+    })
+      .select(PUBLIC_LAWYER_FIELDS)
+      .lean();
 
   let locationContext = null;
 
@@ -153,11 +225,16 @@ export async function searchLawyers({
       escapeRegex(city.trim());
 
     const referenceLocation =
-      await Lawyer.findOne({
-        officeCity: {
-          $regex: `^${escapedCity}$`,
-          $options: "i",
-        },
+      await LawyerProfile.findOne({
+        $and: [
+          PUBLIC_VISIBILITY,
+          {
+            officeCity: {
+              $regex: `^${escapedCity}$`,
+              $options: "i",
+            },
+          },
+        ],
       })
         .select("district province")
         .lean();
@@ -166,7 +243,6 @@ export async function searchLawyers({
       locationContext = {
         district:
           referenceLocation.district,
-
         province:
           referenceLocation.province,
       };
@@ -178,7 +254,7 @@ export async function searchLawyers({
       const categoryScore =
         calculateCategoryScore(
           lawyer,
-          categories
+          practiceArea
         );
 
       const locationMatch =
@@ -210,23 +286,16 @@ export async function searchLawyers({
 
       return {
         ...lawyer,
-
         relevanceScore,
 
         match: {
-          matchedCategories:
-            categories.filter((category) =>
-              lawyer.practiceAreas?.includes(
-                category
-              )
-            ),
-
+          matchedPracticeArea:
+            Boolean(practiceArea),
           locationLabel:
             locationMatch.label,
         },
       };
     })
-
     .filter((lawyer) => {
       if (!city) {
         return true;
@@ -236,7 +305,6 @@ export async function searchLawyers({
         lawyer.match.locationLabel
       );
     })
-
     .sort((a, b) => {
       if (
         b.relevanceScore !==
@@ -253,61 +321,8 @@ export async function searchLawyers({
       );
     });
 
-  const safeLimit = Math.min(
-    Math.max(Number(limit) || 20, 1),
-    50
-  );
-
-  const totalCount =
-    rankedLawyers.length;
-
-  const lawyers = rankedLawyers
-    .slice(0, safeLimit)
-    .map((lawyer) => ({
-      id: lawyer._id,
-
-      displayName:
-        lawyer.displayName,
-
-      professionalTitle:
-        lawyer.professionalTitle,
-
-      officeCity:
-        lawyer.officeCity,
-
-      district:
-        lawyer.district,
-
-      province:
-        lawyer.province,
-
-      primaryPracticeArea:
-        lawyer.primaryPracticeArea,
-
-      practiceAreas:
-        lawyer.practiceAreas,
-
-      languages:
-        lawyer.languages,
-
-      consultationModes:
-        lawyer.consultationModes,
-
-      yearsOfPractice:
-        lawyer.yearsOfPractice,
-
-      description:
-        lawyer.description,
-
-      verificationStatus:
-        lawyer.verificationStatus,
-
-      match:
-        lawyer.match,
-    }));
-
   return {
-    count: totalCount,
-    lawyers,
+    count: rankedLawyers.length,
+    lawyers: rankedLawyers,
   };
 }

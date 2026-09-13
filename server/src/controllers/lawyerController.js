@@ -1,6 +1,10 @@
 import LawyerProfile from "../models/LawyerProfile.js";
 import mongoose from "mongoose";
 
+import {
+  searchPublicLawyers,
+} from "../services/lawyerSearchService.js";
+
 const PUBLIC_LAWYER_FIELDS = [
   "displayName",
   "professionalTitle",
@@ -118,83 +122,24 @@ export const getPublicLawyers = async (req, res) => {
       acceptingNewClients,
     } = req.query;
 
-    const conditions = [];
+    let parsedExperience;
 
-    // PUBLIC VISIBILITY RULE
-    conditions.push({
-      $or: [
-        {
-          isDemo: true,
-          verificationStatus: "demo_verified",
-        },
-        {
-          isDemo: { $ne: true },
-          isPublished: true,
-        },
-      ],
-    });
-
-    // PRACTICE AREA
-    if (practiceArea) {
-      conditions.push({
-        $or: [
-          { primaryPracticeArea: practiceArea },
-          { practiceAreas: practiceArea },
-        ],
-      });
-    }
-
-    // LOCATION
-    if (province) {
-      conditions.push({
-        province,
-      });
-    }
-
-    if (district) {
-      conditions.push({
-        district,
-      });
-    }
-
-    if (city) {
-      conditions.push({
-        officeCity: city,
-      });
-    }
-
-    // LANGUAGE
-    if (language) {
-      conditions.push({
-        languages: language,
-      });
-    }
-
-    // CONSULTATION MODE
-    if (consultationMode) {
-      conditions.push({
-        consultationModes: consultationMode,
-      });
-    }
-
-    // EXPERIENCE
     if (minExperience !== undefined) {
-      const experience = Number(minExperience);
+      parsedExperience = Number(minExperience);
 
-      if (Number.isNaN(experience) || experience < 0) {
+      if (
+        Number.isNaN(parsedExperience) ||
+        parsedExperience < 0
+      ) {
         return res.status(400).json({
-          message: "minExperience must be a valid positive number.",
+          message:
+            "minExperience must be a valid positive number.",
         });
       }
-
-      conditions.push({
-        yearsOfPractice: {
-          $gte: experience,
-        },
-      });
     }
 
-    // ACCEPTING NEW CLIENTS
+    let parsedAcceptingNewClients;
+
     if (acceptingNewClients !== undefined) {
       if (
         acceptingNewClients !== "true" &&
@@ -206,28 +151,28 @@ export const getPublicLawyers = async (req, res) => {
         });
       }
 
-      conditions.push({
-        acceptingNewClients:
-          acceptingNewClients === "true",
-      });
+      parsedAcceptingNewClients =
+        acceptingNewClients === "true";
     }
 
-    const lawyers = await LawyerProfile.find({
-  $and: conditions,
-})
-  .select(PUBLIC_LAWYER_FIELDS)
-  .sort({
-    yearsOfPractice: -1,
-    displayName: 1,
-  })
-  .lean();
-
-    return res.json({
-      count: lawyers.length,
-      lawyers,
+    const result = await searchPublicLawyers({
+      practiceArea,
+      province,
+      district,
+      city,
+      language,
+      consultationMode,
+      minExperience: parsedExperience,
+      acceptingNewClients:
+        parsedAcceptingNewClients,
     });
+
+    return res.json(result);
   } catch (error) {
-    console.error("Get public lawyers error:", error);
+    console.error(
+      "Get public lawyers error:",
+      error
+    );
 
     return res.status(500).json({
       message: "Failed to fetch lawyers.",
