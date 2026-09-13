@@ -2,6 +2,7 @@ import LawyerProfile from "../models/LawyerProfile.js";
 import mongoose from "mongoose";
 
 import {
+  SearchValidationError,
   searchPublicLawyers,
 } from "../services/lawyerSearchService.js";
 
@@ -115,11 +116,14 @@ export const getPublicLawyers = async (req, res) => {
       practiceArea,
       province,
       district,
+      locationId,
       city,
       language,
       consultationMode,
       minExperience,
       acceptingNewClients,
+      page = "1",
+      limit = "10",
     } = req.query;
 
     let parsedExperience;
@@ -127,13 +131,9 @@ export const getPublicLawyers = async (req, res) => {
     if (minExperience !== undefined) {
       parsedExperience = Number(minExperience);
 
-      if (
-        Number.isNaN(parsedExperience) ||
-        parsedExperience < 0
-      ) {
+      if (Number.isNaN(parsedExperience) || parsedExperience < 0) {
         return res.status(400).json({
-          message:
-            "minExperience must be a valid positive number.",
+          message: "minExperience must be a valid non-negative number.",
         });
       }
     }
@@ -146,33 +146,55 @@ export const getPublicLawyers = async (req, res) => {
         acceptingNewClients !== "false"
       ) {
         return res.status(400).json({
-          message:
-            "acceptingNewClients must be either true or false.",
+          message: "acceptingNewClients must be either true or false.",
         });
       }
 
-      parsedAcceptingNewClients =
-        acceptingNewClients === "true";
+      parsedAcceptingNewClients = acceptingNewClients === "true";
+    }
+
+    const parsedPage = Number(page);
+    const parsedLimit = Number(limit);
+
+    if (!Number.isInteger(parsedPage) || parsedPage < 1) {
+      return res.status(400).json({
+        message: "page must be a positive whole number.",
+      });
+    }
+
+    if (
+      !Number.isInteger(parsedLimit) ||
+      parsedLimit < 1 ||
+      parsedLimit > 50
+    ) {
+      return res.status(400).json({
+        message: "limit must be a whole number between 1 and 50.",
+      });
     }
 
     const result = await searchPublicLawyers({
       practiceArea,
       province,
       district,
+      locationId,
       city,
       language,
       consultationMode,
       minExperience: parsedExperience,
-      acceptingNewClients:
-        parsedAcceptingNewClients,
+      acceptingNewClients: parsedAcceptingNewClients,
+      page: parsedPage,
+      limit: parsedLimit,
     });
 
     return res.json(result);
   } catch (error) {
-    console.error(
-      "Get public lawyers error:",
-      error
-    );
+    if (error instanceof SearchValidationError) {
+      return res.status(error.statusCode).json({
+        message: error.message,
+      });
+    }
+
+    console.error("Get public lawyers error:", error);
 
     return res.status(500).json({
       message: "Failed to fetch lawyers.",
