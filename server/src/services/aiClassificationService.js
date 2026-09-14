@@ -2,6 +2,10 @@ import {
   getActiveLegalCategories,
   getActiveLocations,
 } from "./searchMetadataService.js";
+import {
+  requestAIClassification,
+} from "./aiProviders/aiProviderService.js";
+import { AIProviderError } from "./aiProviders/providerError.js";
 
 export class AIClassificationError extends Error {
   constructor(message, statusCode = 500) {
@@ -21,11 +25,6 @@ const VALID_LANGUAGES = new Set([
   "mixed",
   "unknown",
 ]);
-
-const LEGACY_MODEL_MAP = {
-  "deepseek-chat": "deepseek-v4-flash",
-  "deepseek-reasoner": "deepseek-v4-pro",
-};
 
 function normalize(value = "") {
   return String(value).trim().toLowerCase();
@@ -155,125 +154,6 @@ function toPublicCategory(category) {
   };
 }
 
-function getConfiguredModel() {
-  const configured = String(
-    process.env.DEEPSEEK_MODEL || "deepseek-v4-flash"
-  ).trim();
-
-  return LEGACY_MODEL_MAP[configured] || configured;
-}
-
-function getConfiguredApiUrl() {
-  const configured = String(
-    process.env.DEEPSEEK_API_URL ||
-      "https://api.deepseek.com/chat/completions"
-  ).trim();
-
-  if (/\/chat\/completions\/?$/i.test(configured)) {
-    return configured.replace(/\/$/, "");
-  }
-
-  return `${configured.replace(/\/$/, "")}/chat/completions`;
-}
-
-async function requestClassification({ apiKey, systemPrompt, description }) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 25000);
-
-  try {
-    const response = await fetch(getConfiguredApiUrl(), {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: getConfiguredModel(),
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          {
-            role: "user",
-            content: description,
-          },
-        ],
-        response_format: {
-          type: "json_object",
-        },
-        thinking: {
-          type: "disabled",
-        },
-        temperature: 0.1,
-        max_tokens: 600,
-        stream: false,
-      }),
-      signal: controller.signal,
-    });
-
-    if (!response.ok) {
-      console.error("DeepSeek classification request failed:", response.status);
-
-      if (response.status === 429) {
-        throw new AIClassificationError(
-          "The AI service is busy right now. Please wait a moment and try again.",
-          503
-        );
-      }
-
-      throw new AIClassificationError(
-        "The AI classification service could not complete the request.",
-        502
-      );
-    }
-
-    const payload = await response.json();
-    const choice = payload?.choices?.[0];
-
-    if (choice?.finish_reason === "length") {
-      throw new AIClassificationError(
-        "The AI response was incomplete. Please try again.",
-        502
-      );
-    }
-
-    if (choice?.finish_reason === "content_filter") {
-      throw new AIClassificationError(
-        "The description could not be analyzed. Please rephrase it and try again.",
-        400
-      );
-    }
-
-    if (choice?.finish_reason === "insufficient_system_resource") {
-      throw new AIClassificationError(
-        "The AI service is temporarily unavailable. Please try again shortly.",
-        503
-      );
-    }
-
-    return choice?.message?.content || "";
-  } catch (error) {
-    if (error instanceof AIClassificationError) {
-      throw error;
-    }
-
-    if (error.name === "AbortError") {
-      throw new AIClassificationError(
-        "The AI service took too long to respond. Please try again.",
-        504
-      );
-    }
-
-    throw new AIClassificationError(
-      "Unable to reach the AI classification service.",
-      502
-    );
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
-
 function parseLocationCandidates(parsed) {
   if (!Array.isArray(parsed.locationCandidates)) {
     return [];
@@ -332,16 +212,53 @@ function cleanReason(value) {
     .slice(0, 600);
 }
 
-export async function classifyLegalSituation(description) {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
+async function requestAndParseClassification({
+  systemPrompt,
+  description,
+  categoryIds,
+}) {
+  let lastParseError = null;
 
-  if (!apiKey) {
-    throw new AIClassificationError(
-      "Advanced Search is not configured on the server yet.",
-      503
-    );
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    let rawContent = "";
+
+    try {
+      rawContent = await requestAIClassification({
+        systemPrompt,
+        description,
+        categoryIds,
+      });
+    } catch (error) {
+      if (error instanceof AIProviderError) {
+        console.error(
+          `AI provider error [${error.provider}] ${error.code}${
+            error.upstreamStatus ? ` upstream=${error.upstreamStatus}` : ""
+          }: ${error.message}`
+        );
+
+        throw new AIClassificationError(error.message, error.statusCode);
+      }
+
+      throw error;
+    }
+
+    try {
+      return extractJsonObject(rawContent);
+    } catch (error) {
+      lastParseError = error;
+    }
   }
 
+  throw (
+    lastParseError ||
+    new AIClassificationError(
+      "The AI service returned a response that could not be validated.",
+      502
+    )
+  );
+}
+
+export async function classifyLegalSituation(description) {
   const [categories, locations] = await Promise.all([
     getActiveLegalCategories(),
     getActiveLocations(),
@@ -355,33 +272,12 @@ export async function classifyLegalSituation(description) {
   }
 
   const systemPrompt = buildSystemPrompt(categories);
-  let parsed = null;
-  let lastParseError = null;
-
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    const rawContent = await requestClassification({
-      apiKey,
-      systemPrompt,
-      description,
-    });
-
-    try {
-      parsed = extractJsonObject(rawContent);
-      break;
-    } catch (error) {
-      lastParseError = error;
-    }
-  }
-
-  if (!parsed) {
-    throw (
-      lastParseError ||
-      new AIClassificationError(
-        "The AI service returned a response that could not be validated.",
-        502
-      )
-    );
-  }
+  const categoryIds = categories.map((category) => category.categoryId);
+  const parsed = await requestAndParseClassification({
+    systemPrompt,
+    description,
+    categoryIds,
+  });
 
   const categoryMap = new Map(
     categories.map((category) => [category.categoryId, category])
