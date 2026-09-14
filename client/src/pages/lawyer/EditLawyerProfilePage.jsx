@@ -3,19 +3,28 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext.jsx";
 import { apiRequest } from "../../services/api.js";
+import LocationAutocomplete from "../../features/search/components/LocationAutocomplete.jsx";
+import useLegalCategories from "../../features/search/hooks/useLegalCategories.js";
+import {
+  consultationModes,
+  languages,
+} from "../../features/search/data/searchOptions.js";
+import SelectControl from "../../components/ui/SelectControl.jsx";
 
 const initialForm = {
   displayName: "",
   professionalTitle: "",
+  email: "",
   phone: "",
-  province: "",
-  district: "",
   officeCity: "",
+  locationId: "",
+  district: "",
+  province: "",
   primaryPracticeArea: "",
-  practiceAreas: "",
+  practiceAreas: [],
   subAreas: "",
-  languages: "",
-  consultationModes: "",
+  languages: [],
+  consultationModes: [],
   yearsOfPractice: "",
   description: "",
   acceptingNewClients: true,
@@ -24,138 +33,161 @@ const initialForm = {
 export default function EditLawyerProfilePage() {
   const { token } = useAuth();
   const navigate = useNavigate();
+  const { categories, loading: categoriesLoading } = useLegalCategories();
 
   const [form, setForm] = useState(initialForm);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadProfile() {
       try {
-        const data = await apiRequest(
-          "/lawyers/me/profile",
-          {
-            token,
-          }
-        );
+        const data = await apiRequest("/lawyers/me/profile", { token });
+        const activeProfile = data.profile ?? data;
+        const pending = activeProfile.pendingProfileChanges || {};
+        const editable = {
+          ...activeProfile,
+          ...pending,
+          locationId: pending.locationId || activeProfile.locationId || "",
+        };
 
-        const profile = data.profile ?? data;
+        if (cancelled) {
+          return;
+        }
 
+        setProfile(activeProfile);
         setForm({
-          displayName: profile.displayName || "",
-          professionalTitle:
-            profile.professionalTitle || "",
-          phone: profile.phone || "",
-          province: profile.province || "",
-          district: profile.district || "",
-          officeCity: profile.officeCity || "",
-          primaryPracticeArea:
-            profile.primaryPracticeArea || "",
-          practiceAreas:
-            profile.practiceAreas?.join(", ") || "",
-          subAreas:
-            profile.subAreas?.join(", ") || "",
-          languages:
-            profile.languages?.join(", ") || "",
-          consultationModes:
-            profile.consultationModes?.join(", ") ||
-            "",
-          yearsOfPractice:
-            profile.yearsOfPractice ?? "",
-          description: profile.description || "",
-          acceptingNewClients:
-            profile.acceptingNewClients ?? true,
+          displayName: editable.displayName || "",
+          professionalTitle: editable.professionalTitle || "",
+          email: activeProfile.email || "",
+          phone: activeProfile.phone || "",
+          officeCity: editable.officeCity || "",
+          locationId: editable.locationId || "",
+          district: editable.district || "",
+          province: editable.province || "",
+          primaryPracticeArea: editable.primaryPracticeArea || "",
+          practiceAreas: Array.isArray(editable.practiceAreas)
+            ? editable.practiceAreas
+            : [],
+          subAreas: editable.subAreas?.join(", ") || "",
+          languages: Array.isArray(activeProfile.languages)
+            ? activeProfile.languages
+            : [],
+          consultationModes: Array.isArray(activeProfile.consultationModes)
+            ? activeProfile.consultationModes
+            : [],
+          yearsOfPractice: editable.yearsOfPractice ?? "",
+          description: editable.description || "",
+          acceptingNewClients: activeProfile.acceptingNewClients ?? true,
         });
-      } catch (error) {
-        setError(error.message);
+      } catch (requestError) {
+        if (!cancelled) {
+          setError(requestError.message);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
     if (token) {
-      loadProfile();
+      void loadProfile();
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [token]);
 
-  function handleChange(event) {
-    const { name, value, type, checked } =
-      event.target;
+  function update(name, value) {
+    setForm((previous) => ({ ...previous, [name]: value }));
+  }
 
+  function toggleArray(name, value) {
     setForm((previous) => ({
       ...previous,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : value,
+      [name]: previous[name].includes(value)
+        ? previous[name].filter((item) => item !== value)
+        : [...previous[name], value],
+    }));
+  }
+
+  function setPrimaryPracticeArea(value) {
+    setForm((previous) => ({
+      ...previous,
+      primaryPracticeArea: value,
+      practiceAreas: value
+        ? [...new Set([value, ...previous.practiceAreas])]
+        : previous.practiceAreas,
     }));
   }
 
   function convertToArray(value) {
-    return value
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean);
+    return [
+      ...new Set(
+        value
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean)
+      ),
+    ];
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
-
     setSaving(true);
     setError("");
 
+    if (!form.locationId) {
+      setError("Select an office location from the available suggestions.");
+      setSaving(false);
+      return;
+    }
+
+    if (!form.primaryPracticeArea) {
+      setError("Select a primary practice area.");
+      setSaving(false);
+      return;
+    }
+
     try {
-      await apiRequest(
-        "/lawyers/me/profile",
-        {
-          method: "PATCH",
-          token,
-          body: {
-            displayName: form.displayName,
-            professionalTitle:
-              form.professionalTitle,
-            phone: form.phone,
-            province: form.province,
-            district: form.district,
-            officeCity: form.officeCity,
-            primaryPracticeArea:
-              form.primaryPracticeArea,
+      const data = await apiRequest("/lawyers/me/profile", {
+        method: "PATCH",
+        token,
+        body: {
+          displayName: form.displayName.trim(),
+          professionalTitle: form.professionalTitle.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          locationId: form.locationId,
+          officeCity: form.officeCity,
+          primaryPracticeArea: form.primaryPracticeArea,
+          practiceAreas: [
+            ...new Set([form.primaryPracticeArea, ...form.practiceAreas]),
+          ],
+          subAreas: convertToArray(form.subAreas),
+          languages: form.languages,
+          consultationModes: form.consultationModes,
+          yearsOfPractice:
+            form.yearsOfPractice === "" ? 0 : Number(form.yearsOfPractice),
+          description: form.description.trim(),
+          acceptingNewClients: form.acceptingNewClients,
+        },
+      });
 
-            practiceAreas: convertToArray(
-              form.practiceAreas
-            ),
-
-            subAreas: convertToArray(
-              form.subAreas
-            ),
-
-            languages: convertToArray(
-              form.languages
-            ),
-
-            consultationModes: convertToArray(
-              form.consultationModes
-            ),
-
-            yearsOfPractice:
-              form.yearsOfPractice === ""
-                ? 0
-                : Number(
-                    form.yearsOfPractice
-                  ),
-
-            description: form.description,
-
-            acceptingNewClients:
-              form.acceptingNewClients,
-          },
-        }
-      );
-
-      navigate("/lawyer");
-    } catch (error) {
-      setError(error.message);
+      navigate("/profile", {
+        replace: true,
+        state: {
+          profileNotice: data.message || "Profile updated.",
+        },
+      });
+    } catch (requestError) {
+      setError(requestError.message);
     } finally {
       setSaving(false);
     }
@@ -165,9 +197,7 @@ export default function EditLawyerProfilePage() {
     return (
       <main className="min-h-[70vh] bg-brand-background">
         <div className="mx-auto max-w-4xl px-5 py-12 sm:px-6">
-          <p className="text-brand-muted">
-            Loading profile...
-          </p>
+          <p className="text-brand-muted">Loading profile...</p>
         </div>
       </main>
     );
@@ -175,174 +205,307 @@ export default function EditLawyerProfilePage() {
 
   return (
     <main className="min-h-screen bg-brand-background">
-      <div className="mx-auto max-w-4xl px-5 py-12 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-5">
-          <div>
-            <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-[#806600]">
-              Lawyer Account
-            </p>
+      <section className="border-b border-brand-border bg-white">
+        <div className="mx-auto max-w-4xl px-5 py-8 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-[#806600]">
+                Lawyer account
+              </p>
+              <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-brand-black sm:text-4xl">
+                Edit profile
+              </h1>
+              <p className="mt-2 text-sm leading-6 text-brand-muted">
+                Keep your public information accurate and up to date.
+              </p>
+            </div>
 
-            <h1 className="mt-3 text-4xl font-extrabold text-brand-black">
-              Edit Profile
-            </h1>
+            <Link
+              to="/profile"
+              className="self-start rounded-lg border border-brand-border bg-white px-4 py-2.5 text-sm font-semibold text-brand-black transition hover:bg-brand-background"
+            >
+              Back to profile
+            </Link>
+          </div>
+        </div>
+      </section>
 
-            <p className="mt-2 text-brand-muted">
-              Update the information shown on
-              your lawyer profile.
+      <div className="mx-auto max-w-4xl px-5 py-8 sm:px-6 lg:px-8">
+        {profile?.isPublished && (
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
+            <p className="font-bold text-amber-950">How profile updates work</p>
+            <p className="mt-1 text-sm leading-6 text-amber-900/80">
+              Contact preferences update immediately. Professional details such as practice areas, location, experience and public profile text are reviewed before replacing your currently approved profile.
             </p>
           </div>
-
-          <Link
-            to="/lawyer"
-            className="rounded-lg border border-brand-border bg-white px-4 py-2.5 text-sm font-semibold text-brand-black"
-          >
-            Back
-          </Link>
-        </div>
+        )}
 
         {error && (
-          <div className="mt-7 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-red-700">
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-red-700">
             {error}
           </div>
         )}
 
         <form
           onSubmit={handleSubmit}
-          className="mt-8 space-y-7 rounded-2xl border border-brand-border bg-white p-6 shadow-sm sm:p-8"
+          className="space-y-8 rounded-3xl border border-brand-border bg-white p-6 shadow-sm sm:p-8"
         >
-          <div className="grid gap-6 sm:grid-cols-2">
-            <Input
-              label="Display Name"
-              name="displayName"
-              value={form.displayName}
-              onChange={handleChange}
-              required
+          <section>
+            <SectionHeading
+              title="Public details"
+              review={profile?.isPublished}
+            />
+            <div className="mt-5 grid gap-6 sm:grid-cols-2">
+              <Input
+                label="Display name"
+                name="displayName"
+                value={form.displayName}
+                onChange={(event) => update("displayName", event.target.value)}
+                required
+              />
+              <Input
+                label="Professional title"
+                name="professionalTitle"
+                value={form.professionalTitle}
+                onChange={(event) =>
+                  update("professionalTitle", event.target.value)
+                }
+                required
+              />
+              <Input
+                label="Public contact email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={(event) => update("email", event.target.value)}
+                required
+                hint={profile?.isPublished ? "Updates immediately. Your sign-in email does not change." : undefined}
+              />
+              <Input
+                label="Phone"
+                name="phone"
+                value={form.phone}
+                onChange={(event) => update("phone", event.target.value)}
+                hint={profile?.isPublished ? "Updates immediately" : undefined}
+              />
+              <Input
+                label="Years of practice"
+                name="yearsOfPractice"
+                type="number"
+                min="0"
+                step="1"
+                value={form.yearsOfPractice}
+                onChange={(event) =>
+                  update("yearsOfPractice", event.target.value)
+                }
+              />
+            </div>
+          </section>
+
+          <section className="border-t border-brand-border pt-8">
+            <SectionHeading
+              title="Location and practice"
+              review={profile?.isPublished}
+            />
+            <div className="mt-5 grid gap-6 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="edit-lawyer-location"
+                  className="text-sm font-semibold text-brand-black"
+                >
+                  Office location
+                </label>
+                <div className="mt-2">
+                  <LocationAutocomplete
+                    id="edit-lawyer-location"
+                    value={form.officeCity}
+                    onChange={(value) => {
+                      update("officeCity", value);
+                      update("locationId", "");
+                      update("district", "");
+                      update("province", "");
+                    }}
+                    onSelect={(selectedLocation) => {
+                      setForm((previous) => ({
+                        ...previous,
+                        officeCity:
+                          selectedLocation?.city || previous.officeCity,
+                        locationId: selectedLocation?.id || "",
+                        district: selectedLocation?.district || "",
+                        province: selectedLocation?.province || "",
+                      }));
+                    }}
+                    placeholder="Start typing a city"
+                  />
+                </div>
+                {form.locationId && (
+                  <p className="mt-2 text-xs text-brand-muted">
+                    {[form.district, form.province].filter(Boolean).join(", ")}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="edit-primary-practice"
+                  className="text-sm font-semibold text-brand-black"
+                >
+                  Primary practice area
+                </label>
+                <div className="mt-2">
+                  <SelectControl
+                    id="edit-primary-practice"
+                    value={form.primaryPracticeArea}
+                    disabled={categoriesLoading}
+                    onChange={(event) =>
+                      setPrimaryPracticeArea(event.target.value)
+                    }
+                    required
+                  >
+                    <option value="">Select a practice area</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </SelectControl>
+                </div>
+              </div>
+            </div>
+
+            <fieldset className="mt-6">
+              <legend className="text-sm font-semibold text-brand-black">
+                Additional practice areas
+              </legend>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {categories
+                  .filter(
+                    (category) => category.id !== form.primaryPracticeArea
+                  )
+                  .map((category) => (
+                    <label
+                      key={category.id}
+                      className="flex items-center gap-2 rounded-xl border border-brand-border px-3 py-2.5 text-sm transition hover:bg-brand-background"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={form.practiceAreas.includes(category.id)}
+                        onChange={() =>
+                          toggleArray("practiceAreas", category.id)
+                        }
+                      />
+                      {category.name}
+                    </label>
+                  ))}
+              </div>
+            </fieldset>
+          </section>
+
+          <section className="border-t border-brand-border pt-8">
+            <SectionHeading title="Contact preferences" />
+
+            <fieldset className="mt-5">
+              <legend className="text-sm font-semibold text-brand-black">
+                Languages
+              </legend>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {languages.map((language) => (
+                  <label
+                    key={language}
+                    className="flex items-center gap-2 rounded-xl border border-brand-border px-3 py-2.5 text-sm transition hover:bg-brand-background"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={form.languages.includes(language)}
+                      onChange={() => toggleArray("languages", language)}
+                    />
+                    {language}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset className="mt-6">
+              <legend className="text-sm font-semibold text-brand-black">
+                Consultation modes
+              </legend>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {consultationModes.map((mode) => (
+                  <label
+                    key={mode}
+                    className="flex items-center gap-2 rounded-xl border border-brand-border px-3 py-2.5 text-sm transition hover:bg-brand-background"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={form.consultationModes.includes(mode)}
+                      onChange={() => toggleArray("consultationModes", mode)}
+                    />
+                    {mode}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </section>
+
+          <section className="border-t border-brand-border pt-8">
+            <SectionHeading
+              title="Professional description"
+              review={profile?.isPublished}
             />
 
-            <Input
-              label="Professional Title"
-              name="professionalTitle"
-              value={form.professionalTitle}
-              onChange={handleChange}
-            />
-
-            <Input
-              label="Phone"
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-            />
-
-            <Input
-              label="Province"
-              name="province"
-              value={form.province}
-              onChange={handleChange}
-            />
-
-            <Input
-              label="District"
-              name="district"
-              value={form.district}
-              onChange={handleChange}
-            />
-
-            <Input
-              label="Office City"
-              name="officeCity"
-              value={form.officeCity}
-              onChange={handleChange}
-            />
-
-            <Input
-              label="Primary Practice Area"
-              name="primaryPracticeArea"
-              value={form.primaryPracticeArea}
-              onChange={handleChange}
-            />
-
-            <Input
-              label="Years of Practice"
-              name="yearsOfPractice"
-              type="number"
-              min="0"
-              value={form.yearsOfPractice}
-              onChange={handleChange}
-            />
-          </div>
-
-          <ArrayInput
-            label="Practice Areas"
-            helper="Separate multiple values with commas."
-            name="practiceAreas"
-            value={form.practiceAreas}
-            onChange={handleChange}
-          />
-
-          <ArrayInput
-            label="Sub Areas"
-            helper="Example: Divorce and separation, Child custody"
-            name="subAreas"
-            value={form.subAreas}
-            onChange={handleChange}
-          />
-
-          <ArrayInput
-            label="Languages"
-            helper="Example: Sinhala, English, Tamil"
-            name="languages"
-            value={form.languages}
-            onChange={handleChange}
-          />
-
-          <ArrayInput
-            label="Consultation Modes"
-            helper="Example: In Person, Online, Telephone"
-            name="consultationModes"
-            value={form.consultationModes}
-            onChange={handleChange}
-          />
-
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-brand-black">
-              Description
+            <label className="mt-5 block">
+              <span className="text-sm font-semibold text-brand-black">
+                Areas of focus
+              </span>
+              <input
+                type="text"
+                value={form.subAreas}
+                onChange={(event) => update("subAreas", event.target.value)}
+                className="mt-2 w-full rounded-xl border border-brand-border px-4 py-3 outline-none transition focus:border-brand-yellow-dark focus:ring-2 focus:ring-brand-yellow/20"
+              />
+              <p className="mt-2 text-sm text-brand-muted">
+                Separate multiple areas with commas.
+              </p>
             </label>
 
-            <textarea
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              rows="6"
-              className="w-full rounded-xl border border-brand-border px-4 py-3 outline-none focus:border-brand-black"
-            />
-          </div>
+            <label className="mt-6 block">
+              <span className="text-sm font-semibold text-brand-black">
+                About
+              </span>
+              <textarea
+                rows="5"
+                maxLength="2000"
+                value={form.description}
+                onChange={(event) => update("description", event.target.value)}
+                className="mt-2 w-full rounded-xl border border-brand-border px-4 py-3 outline-none transition focus:border-brand-yellow-dark focus:ring-2 focus:ring-brand-yellow/20"
+              />
+            </label>
+          </section>
 
-          <label className="flex items-center gap-3">
+          <label className="flex items-center gap-3 rounded-xl bg-brand-background px-4 py-3 text-sm font-semibold text-brand-black">
             <input
               type="checkbox"
-              name="acceptingNewClients"
-              checked={
-                form.acceptingNewClients
+              checked={form.acceptingNewClients}
+              onChange={(event) =>
+                update("acceptingNewClients", event.target.checked)
               }
-              onChange={handleChange}
-              className="h-4 w-4"
             />
-
-            <span className="text-sm font-semibold text-brand-black">
-              I am currently accepting new
-              clients
-            </span>
+            Accepting new clients
           </label>
 
-          <div className="border-t border-brand-border pt-6">
+          <div className="flex flex-wrap justify-end gap-3 border-t border-brand-border pt-6">
+            <Link
+              to="/profile"
+              className="rounded-xl border border-brand-border px-6 py-3 font-semibold text-brand-black transition hover:bg-brand-background"
+            >
+              Cancel
+            </Link>
             <button
               type="submit"
               disabled={saving}
-              className="rounded-xl bg-brand-black px-6 py-3 font-bold text-white transition hover:bg-brand-dark disabled:opacity-60"
+              className="rounded-xl bg-brand-yellow px-6 py-3 font-bold text-brand-black transition hover:bg-brand-yellow-dark disabled:opacity-60"
             >
-              {saving
-                ? "Saving..."
-                : "Save Changes"}
+              {saving ? "Saving..." : "Save changes"}
             </button>
           </div>
         </form>
@@ -351,56 +514,32 @@ export default function EditLawyerProfilePage() {
   );
 }
 
-function Input({
-  label,
-  name,
-  value,
-  onChange,
-  type = "text",
-  ...props
-}) {
+function SectionHeading({ title, review = false }) {
   return (
-    <div>
-      <label className="mb-2 block text-sm font-semibold text-brand-black">
-        {label}
-      </label>
+    <div className="flex flex-wrap items-center gap-2">
+      <h2 className="text-lg font-bold text-brand-black">{title}</h2>
+      {review && (
+        <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-800">
+          Review required
+        </span>
+      )}
+    </div>
+  );
+}
 
+function Input({ label, name, value, onChange, type = "text", hint, ...props }) {
+  return (
+    <label className="block">
+      <span className="text-sm font-semibold text-brand-black">{label}</span>
       <input
         type={type}
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full rounded-xl border border-brand-border px-4 py-3 outline-none focus:border-brand-black"
+        className="mt-2 h-12 w-full rounded-xl border border-brand-border px-4 outline-none transition focus:border-brand-yellow-dark focus:ring-2 focus:ring-brand-yellow/20"
         {...props}
       />
-    </div>
-  );
-}
-
-function ArrayInput({
-  label,
-  helper,
-  name,
-  value,
-  onChange,
-}) {
-  return (
-    <div>
-      <label className="mb-2 block text-sm font-semibold text-brand-black">
-        {label}
-      </label>
-
-      <input
-        type="text"
-        name={name}
-        value={value}
-        onChange={onChange}
-        className="w-full rounded-xl border border-brand-border px-4 py-3 outline-none focus:border-brand-black"
-      />
-
-      <p className="mt-2 text-sm text-brand-muted">
-        {helper}
-      </p>
-    </div>
+      {hint && <span className="mt-1.5 block text-xs text-brand-muted">{hint}</span>}
+    </label>
   );
 }

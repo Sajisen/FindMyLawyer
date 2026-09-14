@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 
 import logoIcon from "../../assets/findmylawyer-icon.png";
+import { useSavedLawyers } from "../../context/SavedLawyersContext.jsx";
 
 export default function Footer() {
+  const { canSave } = useSavedLawyers();
+
   return (
     <footer className="bg-brand-black text-white">
       <div className="mx-auto max-w-7xl px-5 py-12 sm:px-6 lg:px-8">
@@ -38,6 +41,15 @@ export default function Footer() {
               >
                 Find Lawyers
               </Link>
+
+              {canSave && (
+                <Link
+                  to="/saved-lawyers"
+                  className="transition hover:text-white"
+                >
+                  Saved Lawyers
+                </Link>
+              )}
 
               <Link to="/login" className="transition hover:text-white">
                 Sign in

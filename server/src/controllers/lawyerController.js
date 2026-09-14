@@ -1,32 +1,53 @@
-import LawyerProfile from "../models/LawyerProfile.js";
 import mongoose from "mongoose";
 
+import LawyerProfile from "../models/LawyerProfile.js";
 import {
   SearchValidationError,
   searchPublicLawyers,
 } from "../services/lawyerSearchService.js";
+import {
+  findPublicLawyerById,
+  findPublicLawyersByIds,
+} from "../services/publicLawyerService.js";
+import { getActiveLocation } from "../services/searchMetadataService.js";
+import {
+  ProfileValidationError,
+  parseYearsOfPractice,
+  resolveControlledLocation,
+  resolveControlledPracticeAreas,
+  validateConsultationModes,
+  validateLanguages,
+} from "../services/lawyerProfileValidationService.js";
+import {
+  buildPendingProfileChanges,
+  splitProfileUpdates,
+} from "../services/lawyerProfileReviewService.js";
 
-const PUBLIC_LAWYER_FIELDS = [
-  "displayName",
-  "professionalTitle",
-  "email",
-  "phone",
+const MAX_BATCH_LAWYERS = 100;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  "officeCity",
-  "district",
-  "province",
+function cleanStringArray(values = []) {
+  if (!Array.isArray(values)) {
+    throw new ProfileValidationError("Sub areas must be provided as a list.");
+  }
 
-  "primaryPracticeArea",
-  "practiceAreas",
-  "subAreas",
+  return [
+    ...new Set(
+      values
+        .map((value) => String(value).trim())
+        .filter(Boolean)
+    ),
+  ];
+}
 
-  "languages",
-  "consultationModes",
+async function getLocationIdForCity(city) {
+  if (!city) {
+    return "";
+  }
 
-  "yearsOfPractice",
-  "description",
-  "acceptingNewClients",
-].join(" ");
+  const location = await getActiveLocation({ city });
+  return location ? String(location._id) : "";
+}
 
 // GET LOGGED-IN LAWYER'S PROFILE
 export const getMyLawyerProfile = async (req, res) => {
@@ -34,7 +55,9 @@ export const getMyLawyerProfile = async (req, res) => {
     const profile = await LawyerProfile.findOne({
       userId: req.user.userId,
       isDemo: { $ne: true },
-    }).populate("userId", "name email role");
+    })
+      .populate("userId", "name email role")
+      .lean();
 
     if (!profile) {
       return res.status(404).json({
@@ -42,8 +65,22 @@ export const getMyLawyerProfile = async (req, res) => {
       });
     }
 
+    const [locationId, pendingLocationId] = await Promise.all([
+      getLocationIdForCity(profile.officeCity),
+      getLocationIdForCity(profile.pendingProfileChanges?.officeCity),
+    ]);
+
     return res.json({
-      profile,
+      profile: {
+        ...profile,
+        locationId,
+        pendingProfileChanges: profile.pendingProfileChanges
+          ? {
+              ...profile.pendingProfileChanges,
+              locationId: pendingLocationId,
+            }
+          : null,
+      },
     });
   } catch (error) {
     console.error("Get lawyer profile error:", error);
@@ -53,7 +90,6 @@ export const getMyLawyerProfile = async (req, res) => {
     });
   }
 };
-
 
 // UPDATE LOGGED-IN LAWYER'S PROFILE
 export const updateMyLawyerProfile = async (req, res) => {
@@ -69,37 +105,184 @@ export const updateMyLawyerProfile = async (req, res) => {
       });
     }
 
-    // Only fields that a lawyer is allowed to edit
-    const allowedFields = [
+    const validatedUpdates = {};
+
+    for (const field of [
       "displayName",
       "professionalTitle",
+      "email",
       "phone",
-      "province",
-      "district",
-      "officeCity",
-      "primaryPracticeArea",
-      "practiceAreas",
-      "subAreas",
-      "languages",
-      "consultationModes",
-      "yearsOfPractice",
       "description",
-      "acceptingNewClients",
-    ];
-
-    allowedFields.forEach((field) => {
+    ]) {
       if (req.body[field] !== undefined) {
-        profile[field] = req.body[field];
+        validatedUpdates[field] = String(req.body[field]).trim();
       }
-    });
+    }
+
+    if (
+      validatedUpdates.displayName !== undefined &&
+      !validatedUpdates.displayName
+    ) {
+      return res.status(400).json({
+        message: "Display name cannot be empty.",
+      });
+    }
+
+    if (
+      validatedUpdates.professionalTitle !== undefined &&
+      !validatedUpdates.professionalTitle
+    ) {
+      return res.status(400).json({
+        message: "Professional title cannot be empty.",
+      });
+    }
+
+    if (
+      validatedUpdates.email !== undefined &&
+      (!validatedUpdates.email || !EMAIL_PATTERN.test(validatedUpdates.email))
+    ) {
+      return res.status(400).json({
+        message: "Please provide a valid public contact email address.",
+      });
+    }
+
+    if (req.body.acceptingNewClients !== undefined) {
+      if (typeof req.body.acceptingNewClients !== "boolean") {
+        return res.status(400).json({
+          message: "acceptingNewClients must be true or false.",
+        });
+      }
+      validatedUpdates.acceptingNewClients = req.body.acceptingNewClients;
+    }
+
+    if (req.body.yearsOfPractice !== undefined) {
+      validatedUpdates.yearsOfPractice = parseYearsOfPractice(
+        req.body.yearsOfPractice
+      );
+    }
+
+    if (req.body.languages !== undefined) {
+      validatedUpdates.languages = validateLanguages(req.body.languages);
+    }
+
+    if (req.body.consultationModes !== undefined) {
+      validatedUpdates.consultationModes = validateConsultationModes(
+        req.body.consultationModes
+      );
+    }
+
+    if (req.body.subAreas !== undefined) {
+      validatedUpdates.subAreas = cleanStringArray(req.body.subAreas);
+    }
+
+    if (
+      req.body.locationId !== undefined ||
+      req.body.officeCity !== undefined
+    ) {
+      const location = await resolveControlledLocation({
+        locationId: req.body.locationId,
+        officeCity: req.body.officeCity,
+      });
+
+      validatedUpdates.officeCity = location.city;
+      validatedUpdates.district = location.district;
+      validatedUpdates.province = location.province;
+    }
+
+    if (
+      req.body.primaryPracticeArea !== undefined ||
+      req.body.practiceAreas !== undefined
+    ) {
+      const practiceAreaData = await resolveControlledPracticeAreas({
+        primaryPracticeArea:
+          req.body.primaryPracticeArea ?? profile.primaryPracticeArea,
+        practiceAreas: req.body.practiceAreas ?? profile.practiceAreas,
+      });
+
+      validatedUpdates.primaryPracticeArea =
+        practiceAreaData.primaryPracticeArea;
+      validatedUpdates.practiceAreas = practiceAreaData.practiceAreas;
+    }
+
+    const wasRejected = Boolean(profile.rejectionReason);
+    const { immediate, review } = splitProfileUpdates(validatedUpdates);
+
+    if (profile.isPublished) {
+      // Low-risk operational details can be reflected immediately. Material
+      // professional claims stay pending so the currently approved public
+      // profile remains unchanged until an administrator reviews them.
+      Object.assign(profile, immediate);
+
+      const pendingChanges = buildPendingProfileChanges(profile, review);
+      profile.pendingProfileChanges = pendingChanges;
+
+      if (pendingChanges) {
+        profile.pendingProfileChangesSubmittedAt = new Date();
+        profile.profileUpdateRejectionReason = null;
+      } else {
+        profile.pendingProfileChangesSubmittedAt = null;
+      }
+
+      await profile.save();
+
+      const [locationId, pendingLocationId] = await Promise.all([
+        getLocationIdForCity(profile.officeCity),
+        getLocationIdForCity(profile.pendingProfileChanges?.officeCity),
+      ]);
+
+      return res.json({
+        message: pendingChanges
+          ? "Your immediate changes were saved. Professional changes were submitted for review while your approved public profile remains active."
+          : "Lawyer profile updated successfully.",
+        reviewRequired: Boolean(pendingChanges),
+        profile: {
+          ...profile.toObject(),
+          locationId,
+          pendingProfileChanges: profile.pendingProfileChanges
+            ? {
+                ...profile.pendingProfileChanges,
+                locationId: pendingLocationId,
+              }
+            : null,
+        },
+      });
+    }
+
+    // New or previously rejected lawyers are not public yet, so all validated
+    // changes can be written directly to the application being reviewed.
+    Object.assign(profile, validatedUpdates);
+    profile.pendingProfileChanges = null;
+    profile.pendingProfileChangesSubmittedAt = null;
+    profile.profileUpdateRejectionReason = null;
+
+    if (wasRejected) {
+      profile.isPublished = false;
+      profile.rejectionReason = null;
+      profile.verifiedAt = null;
+      profile.verifiedBy = null;
+    }
 
     await profile.save();
 
+    const locationId = await getLocationIdForCity(profile.officeCity);
+
     return res.json({
-      message: "Lawyer profile updated successfully.",
-      profile,
+      message: wasRejected
+        ? "Lawyer profile updated and resubmitted for review."
+        : "Lawyer profile updated successfully.",
+      reviewRequired: true,
+      profile: {
+        ...profile.toObject(),
+        locationId,
+      },
     });
   } catch (error) {
+    if (error instanceof ProfileValidationError) {
+      return res.status(error.statusCode).json({
+        message: error.message,
+      });
+    }
+
     console.error("Update lawyer profile error:", error);
 
     return res.status(500).json({
@@ -107,8 +290,6 @@ export const updateMyLawyerProfile = async (req, res) => {
     });
   }
 };
-
-
 
 export const getPublicLawyers = async (req, res) => {
   try {
@@ -202,6 +383,37 @@ export const getPublicLawyers = async (req, res) => {
   }
 };
 
+export const getPublicLawyersByIds = async (req, res) => {
+  try {
+    const { lawyerIds = [] } = req.body;
+
+    if (!Array.isArray(lawyerIds)) {
+      return res.status(400).json({
+        message: "lawyerIds must be an array.",
+      });
+    }
+
+    if (lawyerIds.length > MAX_BATCH_LAWYERS) {
+      return res.status(400).json({
+        message: `A maximum of ${MAX_BATCH_LAWYERS} lawyer profiles can be loaded at once.`,
+      });
+    }
+
+    const lawyers = await findPublicLawyersByIds(lawyerIds);
+
+    return res.json({
+      count: lawyers.length,
+      lawyers,
+    });
+  } catch (error) {
+    console.error("Get public lawyers by IDs error:", error);
+
+    return res.status(500).json({
+      message: "Failed to fetch saved lawyer profiles.",
+    });
+  }
+};
+
 export const getPublicLawyerById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -212,22 +424,7 @@ export const getPublicLawyerById = async (req, res) => {
       });
     }
 
-    const lawyer = await LawyerProfile.findOne({
-  _id: id,
-
-  $or: [
-    {
-      isDemo: true,
-      verificationStatus: "demo_verified",
-    },
-    {
-      isDemo: { $ne: true },
-      isPublished: true,
-    },
-  ],
-})
-  .select(PUBLIC_LAWYER_FIELDS)
-  .lean();
+    const lawyer = await findPublicLawyerById(id);
 
     if (!lawyer) {
       return res.status(404).json({

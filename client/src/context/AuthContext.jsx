@@ -79,6 +79,22 @@ export function AuthProvider({ children }) {
     return data;
   }
 
+
+  async function updateAccount(details) {
+    if (!token) {
+      throw new Error("You need to sign in first.");
+    }
+
+    const data = await apiRequest("/auth/me", {
+      method: "PATCH",
+      token,
+      body: details,
+    });
+
+    setUser(data.user);
+    return data.user;
+  }
+
   function logout() {
     localStorage.removeItem("token");
 
@@ -94,6 +110,7 @@ export function AuthProvider({ children }) {
         loading,
         login,
         register,
+        updateAccount,
         logout,
         isAuthenticated: Boolean(user),
       }}

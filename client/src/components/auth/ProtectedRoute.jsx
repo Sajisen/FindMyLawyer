@@ -1,10 +1,11 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 export default function ProtectedRoute({
   children,
   roles = [],
 }) {
+  const location = useLocation();
   const {
     user,
     loading,
@@ -15,9 +16,7 @@ export default function ProtectedRoute({
     return (
       <main className="min-h-[70vh] bg-brand-background">
         <div className="mx-auto max-w-7xl px-5 py-12 sm:px-6 lg:px-8">
-          <p className="text-brand-muted">
-            Loading...
-          </p>
+          <p className="text-brand-muted">Loading...</p>
         </div>
       </main>
     );
@@ -28,6 +27,7 @@ export default function ProtectedRoute({
       <Navigate
         to="/login"
         replace
+        state={{ from: `${location.pathname}${location.search}` }}
       />
     );
   }
@@ -36,12 +36,7 @@ export default function ProtectedRoute({
     roles.length > 0 &&
     !roles.includes(user?.role)
   ) {
-    return (
-      <Navigate
-        to="/"
-        replace
-      />
-    );
+    return <Navigate to="/" replace />;
   }
 
   return children;

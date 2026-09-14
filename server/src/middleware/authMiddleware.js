@@ -18,7 +18,9 @@ export const protect = async (req, res, next) => {
       process.env.JWT_SECRET
     );
 
-    const user = await User.findById(decoded.userId);
+    const user = await User.findById(decoded.userId)
+      .select("_id role email")
+      .lean();
 
     if (!user) {
       return res.status(401).json({

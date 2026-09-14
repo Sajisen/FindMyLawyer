@@ -122,6 +122,24 @@ const lawyerProfileSchema = new mongoose.Schema(
       default: null,
     },
 
+    // Approved lawyers keep their currently verified public data live while
+    // material profile changes wait for an administrator review. Only
+    // backend-validated fields are ever written into this object.
+    pendingProfileChanges: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+
+    pendingProfileChangesSubmittedAt: {
+      type: Date,
+      default: null,
+    },
+
+    profileUpdateRejectionReason: {
+      type: String,
+      default: null,
+    },
+
     // Existing demo compatibility
     verificationStatus: {
       type: String,
