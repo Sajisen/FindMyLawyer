@@ -1,308 +1,111 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-
 import LawyerProfile from "../models/LawyerProfile.js";
 import User from "../models/User.js";
+import Verification from "../models/Verification.js";
+import ActivityLog from "../models/ActivityLog.js";
 import { applyPendingProfileChanges } from "../services/lawyerProfileReviewService.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MAX_REJECTION_REASON_LENGTH = 2000;
-
-function isDuplicateKeyError(error) {
-  return error?.code === 11000;
+const realLawyers = { isDemo: { $ne: true } };
+const statusOf = (lawyer, record) => record?.status || (lawyer.isPublished ? "approved" : lawyer.rejectionReason ? "rejected" : "pending");
+async function actorName(id) {
+  const user = await User.findById(id).select("name");
+  return user?.name || "Unknown admin";
 }
-
-// GET NEW LAWYER APPLICATIONS AND APPROVED-PROFILE UPDATE REQUESTS
+async function recordAction(req, lawyer, action, previous, next, reason = "") {
+  return ActivityLog.create({ actor: req.user.userId, actorName: await actorName(req.user.userId), actorRole: "admin", lawyer, action, previous, next, reason });
+}
+export const getAllLawyers = async (req, res) => {
+  try {
+    const lawyers = await LawyerProfile.find(realLawyers).populate("userId", "name email role").sort({ updatedAt: -1 });
+    const records = await Verification.find({ lawyer: { $in: lawyers.map((lawyer) => lawyer._id) } }).select("lawyer status submissions.number");
+    const byLawyer = new Map(records.map((record) => [String(record.lawyer), record]));
+    res.json({ lawyers: lawyers.map((lawyer) => {
+      const record = byLawyer.get(String(lawyer._id));
+      return { ...lawyer.toObject(), reviewStatus: lawyer.isPublished && lawyer.pendingProfileChanges ? "pending" : statusOf(lawyer, record), resubmitted: (record?.submissions.length || 0) > 1 };
+    }) });
+  } catch (error) { console.error("List lawyers error:", error); res.status(500).json({ message: "Failed to list lawyers." }); }
+};
 export const getPendingLawyers = async (req, res) => {
   try {
-    const lawyers = await LawyerProfile.find({
-      isDemo: { $ne: true },
-      $or: [
-        {
-          isPublished: false,
-          $or: [
-            { rejectionReason: null },
-            { rejectionReason: { $exists: false } },
-          ],
-        },
-        {
-          isPublished: true,
-          pendingProfileChanges: { $ne: null },
-        },
-      ],
-    })
-      .populate("userId", "name email role")
-      .sort({ updatedAt: -1 });
-
-    return res.json({
-      count: lawyers.length,
-      lawyers,
-    });
-  } catch (error) {
-    console.error("Get pending lawyers error:", error);
-
-    return res.status(500).json({
-      message: "Failed to get pending lawyers.",
-    });
-  }
+    const lawyers = await LawyerProfile.find(realLawyers).populate("userId", "name email role").sort({ updatedAt: -1 });
+    const records = await Verification.find({ lawyer: { $in: lawyers.map((lawyer) => lawyer._id) } }).select("lawyer status submissions.number");
+    const byLawyer = new Map(records.map((record) => [String(record.lawyer), record]));
+    const pending = lawyers.filter((lawyer) => {
+      const status = statusOf(lawyer, byLawyer.get(String(lawyer._id)));
+      return status === "pending" || (lawyer.isPublished && lawyer.pendingProfileChanges);
+    }).map((lawyer) => ({ ...lawyer.toObject(), resubmitted: (byLawyer.get(String(lawyer._id))?.submissions.length || 0) > 1 }));
+    res.json({ count: pending.length, lawyers: pending });
+  } catch (error) { console.error("Pending lawyers error:", error); res.status(500).json({ message: "Failed to list pending lawyers." }); }
 };
-
-// APPROVE A NEW LAWYER OR AN APPROVED LAWYER'S PENDING MATERIAL CHANGES
-export const approveLawyer = async (req, res) => {
+export const decideLawyer = async (req, res) => {
   try {
     const { id } = req.params;
-
-    if (!mongoose.isValidObjectId(id)) {
-      return res.status(400).json({
-        message: "Invalid lawyer ID.",
-      });
-    }
-
-    const lawyer = await LawyerProfile.findOne({
-      _id: id,
-      isDemo: { $ne: true },
-    });
-
-    if (!lawyer) {
-      return res.status(404).json({
-        message: "Lawyer profile not found.",
-      });
-    }
-
-    const isProfileUpdate = Boolean(
-      lawyer.isPublished && lawyer.pendingProfileChanges
-    );
-
-    if (isProfileUpdate) {
-      const applied = applyPendingProfileChanges(lawyer);
-
-      if (!applied) {
-        return res.status(400).json({
-          message: "This lawyer has no pending profile changes to approve.",
-        });
+    const { decision, reason = "" } = req.body;
+    if (!mongoose.isValidObjectId(id) || !["approved", "rejected", "pending"].includes(decision) || typeof reason !== "string" || reason.length > 2000 || (decision === "rejected" && !reason.trim())) return res.status(400).json({ message: "Invalid decision or reason." });
+    const lawyer = await LawyerProfile.findOne({ _id: id, ...realLawyers });
+    if (!lawyer) return res.status(404).json({ message: "Lawyer profile not found." });
+    const verification = await Verification.findOne({ lawyer: id });
+    const legacyApproved = !verification && (lawyer.isPublished || await ActivityLog.exists({ lawyer: id, action: "verification_decision_updated", "previous.status": "approved" }));
+    if (decision === "approved" && !verification?.submissions.length && !legacyApproved) return res.status(409).json({ message: "Verification documents are required before approving a new lawyer." });
+    const previous = { status: statusOf(lawyer, verification), isPublished: lawyer.isPublished, reason: verification?.reason || lawyer.rejectionReason || "", pendingProfileChanges: lawyer.pendingProfileChanges || null };
+    const profileUpdate = Boolean(lawyer.isPublished && lawyer.pendingProfileChanges);
+    if (profileUpdate) {
+      if (decision === "approved") {
+        applyPendingProfileChanges(lawyer);
+        lawyer.verifiedAt = new Date(); lawyer.verifiedBy = req.user.userId;
+      } else if (decision === "rejected") {
+        lawyer.pendingProfileChanges = null;
+        lawyer.pendingProfileChangesSubmittedAt = null;
+        lawyer.profileUpdateRejectionReason = reason.trim();
       }
-
-      lawyer.verifiedAt = new Date();
-      lawyer.verifiedBy = req.user.userId;
-      await lawyer.save();
-
-      return res.json({
-        message: "Lawyer profile update approved successfully.",
-        reviewType: "profile_update",
-        lawyer: {
-          id: lawyer._id,
-          displayName: lawyer.displayName,
-          isPublished: lawyer.isPublished,
-          verifiedAt: lawyer.verifiedAt,
-          verifiedBy: lawyer.verifiedBy,
-        },
-      });
+      // A pending material update never removes an already approved public profile.
+    } else {
+      lawyer.isPublished = decision === "approved";
+      lawyer.rejectionReason = decision === "rejected" ? reason.trim() : null;
+      lawyer.verifiedAt = decision === "approved" ? new Date() : null;
+      lawyer.verifiedBy = decision === "approved" ? req.user.userId : null;
+      if (verification) {
+        verification.status = decision;
+        verification.reason = decision === "rejected" ? reason.trim() : "";
+        verification.reviewedBy = req.user.userId;
+        verification.reviewedAt = new Date();
+        await verification.save();
+      }
     }
-
-    lawyer.isPublished = true;
-    lawyer.rejectionReason = null;
-    lawyer.profileUpdateRejectionReason = null;
-    lawyer.pendingProfileChanges = null;
-    lawyer.pendingProfileChangesSubmittedAt = null;
-    lawyer.verifiedAt = new Date();
-    lawyer.verifiedBy = req.user.userId;
-
     await lawyer.save();
-
-    return res.json({
-      message: "Lawyer approved and published successfully.",
-      reviewType: "new_application",
-      lawyer: {
-        id: lawyer._id,
-        displayName: lawyer.displayName,
-        isPublished: lawyer.isPublished,
-        verifiedAt: lawyer.verifiedAt,
-        verifiedBy: lawyer.verifiedBy,
-      },
-    });
-  } catch (error) {
-    console.error("Approve lawyer error:", error);
-
-    return res.status(500).json({
-      message: "Failed to approve lawyer.",
-    });
-  }
+    await recordAction(req, lawyer._id, "verification_decision_updated", previous, { status: profileUpdate ? "approved" : decision, isPublished: lawyer.isPublished, reason: reason.trim(), pendingProfileChanges: lawyer.pendingProfileChanges || null }, reason.trim());
+    res.json({ message: profileUpdate ? "Profile update reviewed." : "Decision saved.", lawyer });
+  } catch (error) { console.error("Decision error:", error); res.status(500).json({ message: "Failed to save decision." }); }
 };
-
-// REJECT A NEW LAWYER OR A PENDING UPDATE WHILE KEEPING AN APPROVED PROFILE LIVE
-export const rejectLawyer = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { reason } = req.body;
-
-    if (!mongoose.isValidObjectId(id)) {
-      return res.status(400).json({
-        message: "Invalid lawyer ID.",
-      });
-    }
-
-    const normalizedReason = String(reason || "").trim();
-
-    if (!normalizedReason) {
-      return res.status(400).json({
-        message: "A rejection reason is required.",
-      });
-    }
-
-    if (normalizedReason.length > MAX_REJECTION_REASON_LENGTH) {
-      return res.status(400).json({
-        message: `Rejection reason must be ${MAX_REJECTION_REASON_LENGTH} characters or fewer.`,
-      });
-    }
-
-    const lawyer = await LawyerProfile.findOne({
-      _id: id,
-      isDemo: { $ne: true },
-    });
-
-    if (!lawyer) {
-      return res.status(404).json({
-        message: "Lawyer profile not found.",
-      });
-    }
-
-    const isProfileUpdate = Boolean(
-      lawyer.isPublished && lawyer.pendingProfileChanges
-    );
-
-    if (isProfileUpdate) {
-      lawyer.pendingProfileChanges = null;
-      lawyer.pendingProfileChangesSubmittedAt = null;
-      lawyer.profileUpdateRejectionReason = normalizedReason;
-
-      // Keep the previously approved profile public and its existing
-      // verification metadata intact.
-      await lawyer.save();
-
-      return res.json({
-        message:
-          "Profile update rejected. The lawyer's previously approved public profile remains active.",
-        reviewType: "profile_update",
-        lawyer: {
-          id: lawyer._id,
-          displayName: lawyer.displayName,
-          isPublished: lawyer.isPublished,
-          profileUpdateRejectionReason: lawyer.profileUpdateRejectionReason,
-        },
-      });
-    }
-
-    lawyer.isPublished = false;
-    lawyer.rejectionReason = normalizedReason;
-    lawyer.verifiedAt = null;
-    lawyer.verifiedBy = null;
-
-    await lawyer.save();
-
-    return res.json({
-      message: "Lawyer application rejected.",
-      reviewType: "new_application",
-      lawyer: {
-        id: lawyer._id,
-        displayName: lawyer.displayName,
-        isPublished: lawyer.isPublished,
-        rejectionReason: lawyer.rejectionReason,
-      },
-    });
-  } catch (error) {
-    console.error("Reject lawyer error:", error);
-
-    return res.status(500).json({
-      message: "Failed to reject lawyer.",
-    });
-  }
+export const approveLawyer = (req, res) => decideLawyer({ ...req, body: { decision: "approved" } }, res);
+export const rejectLawyer = (req, res) => decideLawyer({ ...req, body: { decision: "rejected", reason: req.body.reason } }, res);
+export const getLawyerActivity = async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: "Invalid lawyer ID." });
+  res.json({ entries: await ActivityLog.find({ lawyer: req.params.id }).sort({ createdAt: -1 }).limit(100) });
 };
-
+export const getAdminActivity = async (req, res) => {
+  const page = Math.max(1, Math.min(10000, Number.parseInt(req.query.page, 10) || 1));
+  res.json({ entries: await ActivityLog.find({ actorRole: "admin" }).sort({ createdAt: -1 }).skip((page - 1) * 50).limit(50), page });
+};
 export const createAdmin = async (req, res) => {
   try {
     const name = String(req.body.name || "").trim();
     const email = String(req.body.email || "").trim().toLowerCase();
     const password = String(req.body.password || "");
-
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        message: "Name, email and password are required.",
-      });
-    }
-
-    if (!EMAIL_PATTERN.test(email)) {
-      return res.status(400).json({
-        message: "Please provide a valid email address.",
-      });
-    }
-
-    if (password.length < 8) {
-      return res.status(400).json({
-        message: "Password must be at least 8 characters long.",
-      });
-    }
-
-    const existingUser = await User.findOne({ email }).select("_id").lean();
-
-    if (existingUser) {
-      return res.status(409).json({
-        message: "An account with this email already exists.",
-      });
-    }
-
-    const passwordHash = await bcrypt.hash(password, 12);
-
-    const admin = await User.create({
-      name,
-      email,
-      passwordHash,
-      role: "admin",
-    });
-
-    return res.status(201).json({
-      message: "Admin account created successfully.",
-      admin: {
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-        role: admin.role,
-      },
-    });
-  } catch (error) {
-    if (isDuplicateKeyError(error)) {
-      return res.status(409).json({
-        message: "An account with this email already exists.",
-      });
-    }
-
-    console.error("Create admin error:", error);
-
-    return res.status(500).json({
-      message: "Failed to create admin account.",
-    });
-  }
+    if (!name || !EMAIL_PATTERN.test(email) || password.length < 8) return res.status(400).json({ message: "Provide a name, valid email and password of at least 8 characters." });
+    if (await User.exists({ email })) return res.status(409).json({ message: "An account with this email already exists." });
+    const admin = await User.create({ name, email, passwordHash: await bcrypt.hash(password, 12), role: "admin" });
+    await recordAction(req, null, "admin_created", null, { adminId: admin._id, name, email });
+    res.status(201).json({ message: "Admin account created successfully.", admin: { id: admin._id, name, email, role: "admin" } });
+  } catch (error) { if (error?.code === 11000) return res.status(409).json({ message: "An account with this email already exists." }); console.error("Create admin error:", error); res.status(500).json({ message: "Failed to create admin account." }); }
 };
-
 export const getRegisteredClients = async (req, res) => {
-  try {
-    const clients = await User.find({
-      role: "client",
-    })
-      .select("_id name email createdAt updatedAt")
-      .sort({
-        createdAt: -1,
-      })
-      .lean();
-
-    return res.json({
-      count: clients.length,
-      clients,
-    });
-  } catch (error) {
-    console.error("Get registered clients error:", error);
-
-    return res.status(500).json({
-      message: "Failed to get registered clients.",
-    });
-  }
+  try { const clients = await User.find({ role: "client" }).select("_id name email createdAt updatedAt").sort({ createdAt: -1 }).lean(); res.json({ count: clients.length, clients }); }
+  catch (error) { console.error("List clients error:", error); res.status(500).json({ message: "Failed to list clients." }); }
+};
+export const getRegisteredAdmins = async (req, res) => {
+  try { const admins = await User.find({ role: "admin" }).select("_id name email createdAt").sort({ createdAt: -1 }).lean(); res.json({ count: admins.length, admins }); }
+  catch (error) { console.error("List admins error:", error); res.status(500).json({ message: "Failed to list admins." }); }
 };

@@ -1,0 +1,502 @@
+[
+  {
+    "city": "Gampola",
+    "district": "Kandy",
+    "province": "Central"
+  },
+  {
+    "city": "Kandy",
+    "district": "Kandy",
+    "province": "Central"
+  },
+  {
+    "city": "Katugastota",
+    "district": "Kandy",
+    "province": "Central"
+  },
+  {
+    "city": "Peradeniya",
+    "district": "Kandy",
+    "province": "Central"
+  },
+  {
+    "city": "Dambulla",
+    "district": "Matale",
+    "province": "Central"
+  },
+  {
+    "city": "Galewela",
+    "district": "Matale",
+    "province": "Central"
+  },
+  {
+    "city": "Matale",
+    "district": "Matale",
+    "province": "Central"
+  },
+  {
+    "city": "Ukuwela",
+    "district": "Matale",
+    "province": "Central"
+  },
+  {
+    "city": "Ginigathhena",
+    "district": "Nuwara Eliya",
+    "province": "Central"
+  },
+  {
+    "city": "Hatton",
+    "district": "Nuwara Eliya",
+    "province": "Central"
+  },
+  {
+    "city": "Nuwara Eliya",
+    "district": "Nuwara Eliya",
+    "province": "Central"
+  },
+  {
+    "city": "Talawakele",
+    "district": "Nuwara Eliya",
+    "province": "Central"
+  },
+  {
+    "city": "Akkaraipattu",
+    "district": "Ampara",
+    "province": "Eastern"
+  },
+  {
+    "city": "Ampara",
+    "district": "Ampara",
+    "province": "Eastern"
+  },
+  {
+    "city": "Kalmunai",
+    "district": "Ampara",
+    "province": "Eastern"
+  },
+  {
+    "city": "Sammanthurai",
+    "district": "Ampara",
+    "province": "Eastern"
+  },
+  {
+    "city": "Batticaloa",
+    "district": "Batticaloa",
+    "province": "Eastern"
+  },
+  {
+    "city": "Eravur",
+    "district": "Batticaloa",
+    "province": "Eastern"
+  },
+  {
+    "city": "Kattankudy",
+    "district": "Batticaloa",
+    "province": "Eastern"
+  },
+  {
+    "city": "Valaichchenai",
+    "district": "Batticaloa",
+    "province": "Eastern"
+  },
+  {
+    "city": "Kantale",
+    "district": "Trincomalee",
+    "province": "Eastern"
+  },
+  {
+    "city": "Kinniya",
+    "district": "Trincomalee",
+    "province": "Eastern"
+  },
+  {
+    "city": "Muttur",
+    "district": "Trincomalee",
+    "province": "Eastern"
+  },
+  {
+    "city": "Trincomalee",
+    "district": "Trincomalee",
+    "province": "Eastern"
+  },
+  {
+    "city": "Anuradhapura",
+    "district": "Anuradhapura",
+    "province": "North Central"
+  },
+  {
+    "city": "Kekirawa",
+    "district": "Anuradhapura",
+    "province": "North Central"
+  },
+  {
+    "city": "Medawachchiya",
+    "district": "Anuradhapura",
+    "province": "North Central"
+  },
+  {
+    "city": "Tambuttegama",
+    "district": "Anuradhapura",
+    "province": "North Central"
+  },
+  {
+    "city": "Hingurakgoda",
+    "district": "Polonnaruwa",
+    "province": "North Central"
+  },
+  {
+    "city": "Kaduruwela",
+    "district": "Polonnaruwa",
+    "province": "North Central"
+  },
+  {
+    "city": "Medirigiriya",
+    "district": "Polonnaruwa",
+    "province": "North Central"
+  },
+  {
+    "city": "Polonnaruwa",
+    "district": "Polonnaruwa",
+    "province": "North Central"
+  },
+  {
+    "city": "Kuliyapitiya",
+    "district": "Kurunegala",
+    "province": "North Western"
+  },
+  {
+    "city": "Kurunegala",
+    "district": "Kurunegala",
+    "province": "North Western"
+  },
+  {
+    "city": "Narammala",
+    "district": "Kurunegala",
+    "province": "North Western"
+  },
+  {
+    "city": "Pannala",
+    "district": "Kurunegala",
+    "province": "North Western"
+  },
+  {
+    "city": "Chilaw",
+    "district": "Puttalam",
+    "province": "North Western"
+  },
+  {
+    "city": "Marawila",
+    "district": "Puttalam",
+    "province": "North Western"
+  },
+  {
+    "city": "Puttalam",
+    "district": "Puttalam",
+    "province": "North Western"
+  },
+  {
+    "city": "Wennappuwa",
+    "district": "Puttalam",
+    "province": "North Western"
+  },
+  {
+    "city": "Chavakachcheri",
+    "district": "Jaffna",
+    "province": "Northern"
+  },
+  {
+    "city": "Jaffna",
+    "district": "Jaffna",
+    "province": "Northern"
+  },
+  {
+    "city": "Nallur",
+    "district": "Jaffna",
+    "province": "Northern"
+  },
+  {
+    "city": "Point Pedro",
+    "district": "Jaffna",
+    "province": "Northern"
+  },
+  {
+    "city": "Kilinochchi",
+    "district": "Kilinochchi",
+    "province": "Northern"
+  },
+  {
+    "city": "Pallai",
+    "district": "Kilinochchi",
+    "province": "Northern"
+  },
+  {
+    "city": "Paranthan",
+    "district": "Kilinochchi",
+    "province": "Northern"
+  },
+  {
+    "city": "Poonakary",
+    "district": "Kilinochchi",
+    "province": "Northern"
+  },
+  {
+    "city": "Mannar",
+    "district": "Mannar",
+    "province": "Northern"
+  },
+  {
+    "city": "Murunkan",
+    "district": "Mannar",
+    "province": "Northern"
+  },
+  {
+    "city": "Pesalai",
+    "district": "Mannar",
+    "province": "Northern"
+  },
+  {
+    "city": "Talaimannar",
+    "district": "Mannar",
+    "province": "Northern"
+  },
+  {
+    "city": "Mankulam",
+    "district": "Mullaitivu",
+    "province": "Northern"
+  },
+  {
+    "city": "Mullaitivu",
+    "district": "Mullaitivu",
+    "province": "Northern"
+  },
+  {
+    "city": "Oddusuddan",
+    "district": "Mullaitivu",
+    "province": "Northern"
+  },
+  {
+    "city": "Puthukkudiyiruppu",
+    "district": "Mullaitivu",
+    "province": "Northern"
+  },
+  {
+    "city": "Cheddikulam",
+    "district": "Vavuniya",
+    "province": "Northern"
+  },
+  {
+    "city": "Nedunkeni",
+    "district": "Vavuniya",
+    "province": "Northern"
+  },
+  {
+    "city": "Omanthai",
+    "district": "Vavuniya",
+    "province": "Northern"
+  },
+  {
+    "city": "Vavuniya",
+    "district": "Vavuniya",
+    "province": "Northern"
+  },
+  {
+    "city": "Kegalle",
+    "district": "Kegalle",
+    "province": "Sabaragamuwa"
+  },
+  {
+    "city": "Mawanella",
+    "district": "Kegalle",
+    "province": "Sabaragamuwa"
+  },
+  {
+    "city": "Ruwanwella",
+    "district": "Kegalle",
+    "province": "Sabaragamuwa"
+  },
+  {
+    "city": "Warakapola",
+    "district": "Kegalle",
+    "province": "Sabaragamuwa"
+  },
+  {
+    "city": "Balangoda",
+    "district": "Ratnapura",
+    "province": "Sabaragamuwa"
+  },
+  {
+    "city": "Eheliyagoda",
+    "district": "Ratnapura",
+    "province": "Sabaragamuwa"
+  },
+  {
+    "city": "Embilipitiya",
+    "district": "Ratnapura",
+    "province": "Sabaragamuwa"
+  },
+  {
+    "city": "Ratnapura",
+    "district": "Ratnapura",
+    "province": "Sabaragamuwa"
+  },
+  {
+    "city": "Ambalangoda",
+    "district": "Galle",
+    "province": "Southern"
+  },
+  {
+    "city": "Elpitiya",
+    "district": "Galle",
+    "province": "Southern"
+  },
+  {
+    "city": "Galle",
+    "district": "Galle",
+    "province": "Southern"
+  },
+  {
+    "city": "Hikkaduwa",
+    "district": "Galle",
+    "province": "Southern"
+  },
+  {
+    "city": "Ambalantota",
+    "district": "Hambantota",
+    "province": "Southern"
+  },
+  {
+    "city": "Hambantota",
+    "district": "Hambantota",
+    "province": "Southern"
+  },
+  {
+    "city": "Tangalle",
+    "district": "Hambantota",
+    "province": "Southern"
+  },
+  {
+    "city": "Tissamaharama",
+    "district": "Hambantota",
+    "province": "Southern"
+  },
+  {
+    "city": "Akuressa",
+    "district": "Matara",
+    "province": "Southern"
+  },
+  {
+    "city": "Dikwella",
+    "district": "Matara",
+    "province": "Southern"
+  },
+  {
+    "city": "Matara",
+    "district": "Matara",
+    "province": "Southern"
+  },
+  {
+    "city": "Weligama",
+    "district": "Matara",
+    "province": "Southern"
+  },
+  {
+    "city": "Badulla",
+    "district": "Badulla",
+    "province": "Uva"
+  },
+  {
+    "city": "Bandarawela",
+    "district": "Badulla",
+    "province": "Uva"
+  },
+  {
+    "city": "Mahiyanganaya",
+    "district": "Badulla",
+    "province": "Uva"
+  },
+  {
+    "city": "Welimada",
+    "district": "Badulla",
+    "province": "Uva"
+  },
+  {
+    "city": "Bibile",
+    "district": "Monaragala",
+    "province": "Uva"
+  },
+  {
+    "city": "Buttala",
+    "district": "Monaragala",
+    "province": "Uva"
+  },
+  {
+    "city": "Monaragala",
+    "district": "Monaragala",
+    "province": "Uva"
+  },
+  {
+    "city": "Wellawaya",
+    "district": "Monaragala",
+    "province": "Uva"
+  },
+  {
+    "city": "Colombo",
+    "district": "Colombo",
+    "province": "Western"
+  },
+  {
+    "city": "Dehiwala-Mount Lavinia",
+    "district": "Colombo",
+    "province": "Western"
+  },
+  {
+    "city": "Maharagama",
+    "district": "Colombo",
+    "province": "Western"
+  },
+  {
+    "city": "Sri Jayawardenepura Kotte",
+    "district": "Colombo",
+    "province": "Western"
+  },
+  {
+    "city": "Gampaha",
+    "district": "Gampaha",
+    "province": "Western"
+  },
+  {
+    "city": "Ja-Ela",
+    "district": "Gampaha",
+    "province": "Western"
+  },
+  {
+    "city": "Negombo",
+    "district": "Gampaha",
+    "province": "Western"
+  },
+  {
+    "city": "Wattala",
+    "district": "Gampaha",
+    "province": "Western"
+  },
+  {
+    "city": "Beruwala",
+    "district": "Kalutara",
+    "province": "Western"
+  },
+  {
+    "city": "Horana",
+    "district": "Kalutara",
+    "province": "Western"
+  },
+  {
+    "city": "Kalutara",
+    "district": "Kalutara",
+    "province": "Western"
+  },
+  {
+    "city": "Panadura",
+    "district": "Kalutara",
+    "province": "Western"
+  }
+]

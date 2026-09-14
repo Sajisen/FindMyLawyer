@@ -8,6 +8,7 @@ import {
   updateMyLawyerProfile,
 } from "../controllers/lawyerController.js";
 
+import { getMine, submit, viewFile } from "../controllers/verificationController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { allowRoles } from "../middleware/roleMiddleware.js";
 
@@ -32,6 +33,10 @@ router.patch(
   allowRoles("lawyer"),
   updateMyLawyerProfile
 );
+
+router.get("/me/verification", protect, allowRoles("lawyer"), getMine);
+router.post("/me/verification", protect, allowRoles("lawyer"), submit);
+router.get("/:lawyerId/verification/submissions/:submissionId/files/:fileId", protect, allowRoles("lawyer"), viewFile);
 
 // PUBLIC INDIVIDUAL LAWYER
 // Keep this route last so fixed paths above are not interpreted as IDs.

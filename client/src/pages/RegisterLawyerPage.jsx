@@ -23,6 +23,7 @@ const initialForm = {
   district: "",
   province: "",
   primaryPracticeArea: "",
+  secondaryPracticeAreas: [],
   yearsOfPractice: "",
   description: "",
   languages: [],
@@ -57,6 +58,7 @@ export default function RegisterLawyerPage() {
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [secondaryChoice, setSecondaryChoice] = useState("");
 
   function update(name, value) {
     setForm((previous) => ({ ...previous, [name]: value }));
@@ -69,6 +71,12 @@ export default function RegisterLawyerPage() {
         ? previous[name].filter((item) => item !== value)
         : [...previous[name], value],
     }));
+  }
+
+  function addSecondaryArea() {
+    if (!secondaryChoice || secondaryChoice === form.primaryPracticeArea || form.secondaryPracticeAreas.includes(secondaryChoice)) return;
+    update("secondaryPracticeAreas", [...form.secondaryPracticeAreas, secondaryChoice]);
+    setSecondaryChoice("");
   }
 
   async function handleSubmit(event) {
@@ -98,7 +106,7 @@ export default function RegisterLawyerPage() {
         locationId: form.locationId,
         officeCity: form.officeCity,
         primaryPracticeArea: form.primaryPracticeArea,
-        practiceAreas: [form.primaryPracticeArea],
+        practiceAreas: [form.primaryPracticeArea, ...form.secondaryPracticeAreas],
         languages: form.languages,
         consultationModes: form.consultationModes,
         yearsOfPractice: Number(form.yearsOfPractice || 0),
@@ -223,6 +231,12 @@ export default function RegisterLawyerPage() {
                       ))}
                     </SelectControl>
                   </div>
+                </div>
+
+                <div>
+                  <label htmlFor="lawyer-secondary-practice" className="text-sm font-semibold text-brand-black">Other practice areas (optional)</label>
+                  <div className="mt-2 flex gap-2"><select id="lawyer-secondary-practice" value={secondaryChoice} onChange={(event) => setSecondaryChoice(event.target.value)} className="w-full rounded-xl border border-brand-border p-3"><option value="">Select an area</option>{categories.filter((item) => item.id !== form.primaryPracticeArea && !form.secondaryPracticeAreas.includes(item.id)).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select><button type="button" onClick={addSecondaryArea} className="rounded-xl border px-4">Add</button></div>
+                  <div className="mt-2 flex flex-wrap gap-2">{form.secondaryPracticeAreas.map((id) => <button type="button" key={id} onClick={() => update("secondaryPracticeAreas", form.secondaryPracticeAreas.filter((value) => value !== id))} className="rounded-full bg-brand-background px-3 py-1 text-sm">{categories.find((item) => item.id === id)?.name || id} ×</button>)}</div>
                 </div>
 
                 <label className="block">

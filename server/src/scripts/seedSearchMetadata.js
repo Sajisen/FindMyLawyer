@@ -1,16 +1,11 @@
 import "dotenv/config";
 
 import { connectDB } from "../config/db.js";
-import LegalCategory from "../models/LegalCategory.js";
-import Location from "../models/Location.js";
 import { ensureSearchMetadata } from "../services/searchMetadataService.js";
 
 async function run() {
   try {
     await connectDB();
-
-    await LegalCategory.deleteMany({});
-    await Location.deleteMany({});
 
     await ensureSearchMetadata();
 

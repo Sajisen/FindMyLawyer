@@ -15,6 +15,8 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import EditLawyerProfilePage from "./pages/lawyer/EditLawyerProfilePage.jsx";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage.jsx";
 
+import LawyerVerificationPage from "./pages/lawyer/LawyerVerificationPage.jsx";
+
 function App() {
   return (
     <>
@@ -65,6 +67,7 @@ function App() {
           }
         />
 
+        <Route path="/lawyer/verification" element={<ProtectedRoute roles={["lawyer"]}><LawyerVerificationPage /></ProtectedRoute>} />
         <Route
           path="/admin"
           element={

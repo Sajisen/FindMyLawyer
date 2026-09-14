@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import ActivityLog from "../models/ActivityLog.js";
+import User from "../models/User.js";
+import Verification from "../models/Verification.js";
+import { normalizeSriLankanPhone, isPhoneInUse, isPhoneDuplicateError } from "../services/lawyerPhone.js";
 
 import LawyerProfile from "../models/LawyerProfile.js";
 import {
@@ -204,6 +208,13 @@ export const updateMyLawyerProfile = async (req, res) => {
       validatedUpdates.practiceAreas = practiceAreaData.practiceAreas;
     }
 
+    if (validatedUpdates.phone !== undefined) {
+      const normalized = normalizeSriLankanPhone(validatedUpdates.phone);
+      if (!normalized) return res.status(400).json({ message: "Enter a valid Sri Lankan phone number." });
+      if (await isPhoneInUse(normalized, profile._id)) return res.status(409).json({ message: "This phone number is already registered." });
+      profile.normalizedPhone = normalized;
+    }
+    const previous = Object.fromEntries(Object.keys(validatedUpdates).map((field) => [field, profile.pendingProfileChanges?.[field] ?? profile[field]]));
     const wasRejected = Boolean(profile.rejectionReason);
     const { immediate, review } = splitProfileUpdates(validatedUpdates);
 
@@ -224,6 +235,8 @@ export const updateMyLawyerProfile = async (req, res) => {
       }
 
       await profile.save();
+      const actor = await User.findById(req.user.userId).select("name");
+      await ActivityLog.create({ actor: req.user.userId, actorName: actor?.name || "Lawyer", actorRole: "lawyer", lawyer: profile._id, action: "profile_updated", previous, next: validatedUpdates });
 
       const [locationId, pendingLocationId] = await Promise.all([
         getLocationIdForCity(profile.officeCity),
@@ -256,6 +269,8 @@ export const updateMyLawyerProfile = async (req, res) => {
     profile.profileUpdateRejectionReason = null;
 
     if (wasRejected) {
+      const verification = await Verification.findOne({ lawyer: profile._id, status: "rejected" });
+      if (verification) { verification.status = "pending"; verification.reason = ""; await verification.save(); }
       profile.isPublished = false;
       profile.rejectionReason = null;
       profile.verifiedAt = null;
@@ -263,6 +278,8 @@ export const updateMyLawyerProfile = async (req, res) => {
     }
 
     await profile.save();
+    const actor = await User.findById(req.user.userId).select("name");
+    await ActivityLog.create({ actor: req.user.userId, actorName: actor?.name || "Lawyer", actorRole: "lawyer", lawyer: profile._id, action: "profile_updated", previous, next: validatedUpdates });
 
     const locationId = await getLocationIdForCity(profile.officeCity);
 
@@ -277,6 +294,7 @@ export const updateMyLawyerProfile = async (req, res) => {
       },
     });
   } catch (error) {
+    if (isPhoneDuplicateError(error)) return res.status(409).json({ message: "This phone number is already registered." });
     if (error instanceof ProfileValidationError) {
       return res.status(error.statusCode).json({
         message: error.message,

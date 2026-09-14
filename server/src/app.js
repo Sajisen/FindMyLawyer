@@ -20,6 +20,7 @@ app.use(
   })
 );
 
+app.use("/api/lawyers/me/verification", express.json({ limit: "13mb" }));
 app.use(express.json({ limit: "25kb" }));
 
 app.get("/api/health", (req, res) => {

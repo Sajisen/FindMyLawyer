@@ -1,536 +1,101 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-
 import { useAuth } from "../../context/AuthContext.jsx";
-import { apiRequest } from "../../services/api.js";
-import useLegalCategories from "../../features/search/hooks/useLegalCategories.js";
+import { apiRequest, API_URL } from "../../services/api.js";
 
-const formatDate = (value) =>
-  value ? new Date(value).toLocaleDateString() : "Not available";
+const labels = { pending: "Pending", approved: "Approved", rejected: "Changes requested" };
+const actionNames = { verification_decision_updated: "Decision updated", verification_resubmitted: "Verification resubmitted", verification_submitted: "Verification submitted", profile_updated: "Profile updated", admin_created: "Admin created" };
+const fileNames = { certificate: "Enrolment certificate", nicFront: "NIC front", nicBack: "NIC back", passport: "Passport" };
+const date = (value) => value ? new Date(value).toLocaleString() : "Not available";
+const th = "bg-brand-background px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-brand-muted";
+const td = "border-t border-brand-border px-4 py-3 text-sm align-top";
+const button = "rounded-lg border border-brand-border bg-white px-4 py-2 text-sm font-semibold hover:bg-brand-background disabled:opacity-50";
+function Status({ value }) { return <span className={`rounded-full px-3 py-1 text-xs font-bold ${value === "approved" ? "bg-green-50 text-green-800" : value === "rejected" ? "bg-red-50 text-red-800" : "bg-amber-50 text-amber-800"}`}>{labels[value] || value}</span>; }
+function Table({ headers, rows, empty }) { return <div className="overflow-x-auto rounded-xl border border-brand-border bg-white"><table className="w-full min-w-[650px] text-left"><thead><tr>{headers.map((head) => <th key={head} className={th}>{head}</th>)}</tr></thead><tbody>{rows}</tbody></table>{!rows.length && <p className="p-6 text-center text-brand-muted">{empty}</p>}</div>; }
 
 export default function AdminDashboardPage() {
   const { user, token } = useAuth();
-  const { categories } = useLegalCategories();
-  const categoryNames = useMemo(
-    () => Object.fromEntries(categories.map((category) => [category.id, category.name])),
-    [categories]
-  );
-
   const [lawyers, setLawyers] = useState([]);
   const [clients, setClients] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [admins, setAdmins] = useState([]);
+  const [activity, setActivity] = useState([]);
+  const [tab, setTab] = useState("lawyers");
+  const [userTab, setUserTab] = useState("clients");
+  const [filter, setFilter] = useState("all");
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState(null);
+  const [verification, setVerification] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [preview, setPreview] = useState(null);
+  const [decision, setDecision] = useState("pending");
+  const [reason, setReason] = useState("");
+  const [showAdminForm, setShowAdminForm] = useState(false);
+  const [newAdmin, setNewAdmin] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [busyId, setBusyId] = useState(null);
-  const [selectedId, setSelectedId] = useState(null);
-  const [rejectId, setRejectId] = useState(null);
-  const [reason, setReason] = useState("");
-  const [tab, setTab] = useState("lawyers");
-
+  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [detailsLoading, setDetailsLoading] = useState(false);
   const refresh = useCallback(async () => {
-    try {
-      const [pending, registered] = await Promise.all([
-        apiRequest("/admin/lawyers/pending", { token }),
-        apiRequest("/admin/clients", { token }),
-      ]);
-      setLawyers(pending.lawyers ?? []);
-      setClients(registered.clients ?? []);
-      setError("");
-    } catch (requestError) {
-      setError(requestError.message);
-    } finally {
-      setLoading(false);
-    }
+    const [people, customers, staff, logs] = await Promise.all([apiRequest("/admin/lawyers", { token }), apiRequest("/admin/clients", { token }), apiRequest("/admin/admins", { token }), apiRequest("/admin/activity", { token })]);
+    setLawyers(people.lawyers || []); setClients(customers.clients || []); setAdmins(staff.admins || []); setActivity(logs.entries || []);
   }, [token]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      void refresh();
-    }, 0);
-    return () => clearTimeout(timer);
-  }, [refresh]);
-
-  async function decide(lawyer, action) {
-    if (busyId) return;
-
-    const trimmedReason = reason.trim();
-    if (action === "reject" && !trimmedReason) {
-      setError("Enter a reason before rejecting this review.");
-      return;
-    }
-
-    setBusyId(lawyer._id);
-    setError("");
-    setNotice("");
-
+  useEffect(() => { const timer = setTimeout(() => { refresh().catch((err) => setError(err.message)).finally(() => setLoading(false)); }, 0); return () => clearTimeout(timer); }, [refresh]);
+  const counts = { all: lawyers.length, pending: lawyers.filter((row) => row.reviewStatus === "pending").length, resubmitted: lawyers.filter((row) => row.resubmitted && row.reviewStatus === "pending").length, approved: lawyers.filter((row) => row.reviewStatus === "approved").length, rejected: lawyers.filter((row) => row.reviewStatus === "rejected").length };
+  const visible = useMemo(() => lawyers.filter((row) => (filter === "all" || (filter === "resubmitted" ? row.resubmitted && row.reviewStatus === "pending" : row.reviewStatus === filter)) && `${row.displayName} ${row.userId?.email || row.email} ${row.primaryPracticeArea}`.toLowerCase().includes(query.trim().toLowerCase())), [lawyers, filter, query]);
+  const names = Object.fromEntries(lawyers.map((row) => [row._id, row.displayName]));
+  const canApprove = Boolean(verification?.submissions?.length || selected?.isPublished || history.some((entry) => entry.previous?.status === "approved"));
+  function closePreview() { if (preview?.url) URL.revokeObjectURL(preview.url); setPreview(null); }
+  async function toggleProfile(row) {
+    if (selected?._id === row._id) { closePreview(); setSelected(null); return; }
+    closePreview(); setSelected(row); setVerification(null); setHistory([]); setShowHistory(false); setDetailsLoading(true); setError(""); setDecision(row.reviewStatus); setReason(row.rejectionReason || "");
     try {
-      const data = await apiRequest(`/admin/lawyers/${lawyer._id}/${action}`, {
-        method: "PATCH",
-        token,
-        ...(action === "reject" ? { body: { reason: trimmedReason } } : {}),
-      });
-
-      setLawyers((previous) =>
-        previous.filter((item) => item._id !== lawyer._id)
-      );
-      setNotice(
-        data.message ||
-          `Review ${action === "approve" ? "approved" : "rejected"}.`
-      );
-      setSelectedId(null);
-      setRejectId(null);
-      setReason("");
-    } catch (requestError) {
-      setError(requestError.message);
-    } finally {
-      setBusyId(null);
-    }
+      const [docs, log] = await Promise.all([apiRequest(`/admin/lawyers/${row._id}/verification`, { token }), apiRequest(`/admin/lawyers/${row._id}/activity`, { token })]);
+      setVerification(docs.verification); setHistory(log.entries || []); setReason(docs.verification?.reason || row.rejectionReason || "");
+    } catch (err) { setError(err.message); } finally { setDetailsLoading(false); }
   }
-
-  return (
-    <main className="min-h-[75vh] bg-brand-background">
-      <div className="mx-auto max-w-7xl px-5 py-10 sm:px-6 lg:px-8">
-        <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-[#806600]">
-          Administration
-        </p>
-        <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-brand-black sm:text-4xl">
-              Admin panel
-            </h1>
-            <p className="mt-2 text-brand-muted">
-              Welcome, {user?.name || "Admin"}. Review lawyer applications,
-              profile updates and registered clients.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setLoading(true);
-              void refresh();
-            }}
-            disabled={loading || Boolean(busyId)}
-            className="rounded-xl border border-brand-border bg-white px-5 py-3 text-sm font-semibold transition hover:bg-brand-background disabled:opacity-50"
-          >
-            Refresh
-          </button>
-        </div>
-
-        {error && (
-          <p
-            role="alert"
-            className="mt-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-red-700"
-          >
-            {error}
-          </p>
-        )}
-        {notice && (
-          <p
-            role="status"
-            className="mt-6 rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-green-800"
-          >
-            {notice}
-          </p>
-        )}
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <Summary label="Pending reviews" value={loading ? "..." : lawyers.length} />
-          <Summary label="Registered clients" value={loading ? "..." : clients.length} />
-        </div>
-
-        <div
-          className="mt-8 flex gap-2 border-b border-brand-border"
-          role="tablist"
-          aria-label="Admin sections"
-        >
-          <Tab active={tab === "lawyers"} onClick={() => setTab("lawyers")}>
-            Lawyer reviews
-          </Tab>
-          <Tab active={tab === "clients"} onClick={() => setTab("clients")}>
-            Clients
-          </Tab>
-        </div>
-
-        {loading ? (
-          <p className="py-10 text-brand-muted">Loading administration data...</p>
-        ) : tab === "lawyers" ? (
-          <section className="mt-6 space-y-4" aria-label="Pending lawyer reviews">
-            {lawyers.length === 0 && (
-              <Empty text="No lawyer applications or profile updates are waiting for review." />
-            )}
-
-            {lawyers.map((lawyer) => {
-              const isProfileUpdate = Boolean(
-                lawyer.isPublished && lawyer.pendingProfileChanges
-              );
-
-              return (
-                <article
-                  key={lawyer._id}
-                  className="rounded-2xl border border-brand-border bg-white p-5 shadow-sm sm:p-6"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-xl font-bold text-brand-black">
-                        {lawyer.displayName}
-                      </h2>
-                      <p className="mt-1 text-sm text-brand-muted">
-                        {lawyer.professionalTitle || "Attorney-at-Law"} ·{" "}
-                        {categoryNames[lawyer.primaryPracticeArea] ||
-                          lawyer.primaryPracticeArea ||
-                          "Practice area not provided"}
-                      </p>
-                      <p className="mt-1 text-sm text-brand-muted">
-                        {[lawyer.officeCity, lawyer.district]
-                          .filter(Boolean)
-                          .join(", ") || "Location not provided"}
-                        {" · "}
-                        {isProfileUpdate ? "Submitted" : "Applied"}{" "}
-                        {formatDate(
-                          isProfileUpdate
-                            ? lawyer.pendingProfileChangesSubmittedAt
-                            : lawyer.createdAt
-                        )}
-                      </p>
-                    </div>
-
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-bold ${
-                        isProfileUpdate
-                          ? "bg-amber-50 text-amber-800"
-                          : "bg-brand-yellow-soft text-brand-black"
-                      }`}
-                    >
-                      {isProfileUpdate ? "Profile update" : "New application"}
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    aria-expanded={selectedId === lawyer._id}
-                    onClick={() => {
-                      setSelectedId(
-                        selectedId === lawyer._id ? null : lawyer._id
-                      );
-                      setRejectId(null);
-                      setReason("");
-                    }}
-                    className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-brand-black hover:text-[#806600]"
-                  >
-                    {selectedId === lawyer._id
-                      ? "Hide review details"
-                      : "Review details"}
-                    <span aria-hidden="true">
-                      {selectedId === lawyer._id ? "↑" : "↓"}
-                    </span>
-                  </button>
-
-                  {selectedId === lawyer._id && (
-                    <div className="mt-5 border-t border-brand-border pt-5">
-                      {isProfileUpdate ? (
-                        <ProfileUpdateReview
-                          lawyer={lawyer}
-                          categoryNames={categoryNames}
-                        />
-                      ) : (
-                        <NewApplicationDetails
-                          lawyer={lawyer}
-                          categoryNames={categoryNames}
-                        />
-                      )}
-
-                      <div className="mt-6 flex flex-wrap gap-3">
-                        <button
-                          type="button"
-                          disabled={Boolean(busyId)}
-                          onClick={() => decide(lawyer, "approve")}
-                          className="rounded-xl bg-brand-yellow px-5 py-2.5 text-sm font-bold text-brand-black transition hover:bg-brand-yellow-dark disabled:opacity-50"
-                        >
-                          {busyId === lawyer._id
-                            ? "Saving..."
-                            : isProfileUpdate
-                              ? "Approve update"
-                              : "Approve and publish"}
-                        </button>
-                        <button
-                          type="button"
-                          disabled={Boolean(busyId)}
-                          onClick={() => {
-                            setRejectId(
-                              rejectId === lawyer._id ? null : lawyer._id
-                            );
-                            setReason("");
-                          }}
-                          className="rounded-xl border border-red-200 bg-white px-5 py-2.5 text-sm font-bold text-red-700 transition hover:bg-red-50 disabled:opacity-50"
-                        >
-                          {isProfileUpdate ? "Reject update" : "Reject"}
-                        </button>
-                      </div>
-
-                      {rejectId === lawyer._id && (
-                        <form
-                          onSubmit={(event) => {
-                            event.preventDefault();
-                            void decide(lawyer, "reject");
-                          }}
-                          className="mt-5 max-w-xl rounded-xl bg-brand-background p-4"
-                        >
-                          <label
-                            htmlFor={`reason-${lawyer._id}`}
-                            className="block text-sm font-semibold"
-                          >
-                            Reason for rejection
-                          </label>
-                          <textarea
-                            id={`reason-${lawyer._id}`}
-                            required
-                            maxLength={2000}
-                            value={reason}
-                            onChange={(event) => setReason(event.target.value)}
-                            rows={3}
-                            className="mt-2 w-full rounded-lg border border-brand-border bg-white p-3 outline-none focus:border-brand-yellow-dark"
-                            placeholder={
-                              isProfileUpdate
-                                ? "Explain why the requested profile changes were not approved"
-                                : "Explain what the lawyer needs to correct"
-                            }
-                          />
-                          <button
-                            disabled={Boolean(busyId) || !reason.trim()}
-                            className="mt-2 rounded-lg bg-red-700 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50"
-                          >
-                            Confirm rejection
-                          </button>
-                        </form>
-                      )}
-                    </div>
-                  )}
-                </article>
-              );
-            })}
-          </section>
-        ) : (
-          <section className="mt-6" aria-label="Registered clients">
-            {clients.length === 0 ? (
-              <Empty text="No clients have registered yet." />
-            ) : (
-              <div className="overflow-x-auto rounded-2xl border border-brand-border bg-white shadow-sm">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-brand-background text-brand-muted">
-                    <tr>
-                      <th className="p-4">Name</th>
-                      <th className="p-4">Email</th>
-                      <th className="p-4">Registered</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {clients.map((client) => (
-                      <tr key={client._id} className="border-t border-brand-border">
-                        <td className="p-4 font-semibold">
-                          {client.name || "Unknown"}
-                        </td>
-                        <td className="p-4">{client.email}</td>
-                        <td className="p-4">{formatDate(client.createdAt)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
-        )}
-      </div>
-    </main>
-  );
-}
-
-function NewApplicationDetails({ lawyer, categoryNames }) {
-  return (
-    <>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Detail label="Account email" value={lawyer.userId?.email || lawyer.email} />
-        <Detail label="Contact email" value={lawyer.email} />
-        <Detail label="Phone" value={lawyer.phone} />
-        <Detail
-          label="Experience"
-          value={
-            lawyer.yearsOfPractice != null
-              ? `${lawyer.yearsOfPractice} years`
-              : null
-          }
-        />
-        <Detail
-          label="Practice areas"
-          value={lawyer.practiceAreas
-            ?.map((area) => categoryNames[area] || area)
-            .join(", ")}
-        />
-        <Detail label="Languages" value={lawyer.languages?.join(", ")} />
-        <Detail
-          label="Consultation modes"
-          value={lawyer.consultationModes?.join(", ")}
-        />
-        <Detail label="Province" value={lawyer.province} />
-        <Detail
-          label="Accepting new clients"
-          value={lawyer.acceptingNewClients ? "Yes" : "No"}
-        />
-      </div>
-      <div className="mt-5">
-        <Detail label="About" value={lawyer.description} />
-      </div>
-    </>
-  );
-}
-
-function ProfileUpdateReview({ lawyer, categoryNames }) {
-  const pending = lawyer.pendingProfileChanges || {};
-  const rows = getProfileUpdateRows(lawyer, pending, categoryNames);
-
-  return (
-    <div>
-      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
-        This lawyer is already approved. Their current public profile stays live
-        until these requested professional changes are approved.
-      </div>
-
-      {rows.length > 0 ? (
-        <div className="mt-5 overflow-hidden rounded-xl border border-brand-border">
-          <div className="hidden grid-cols-[150px_minmax(0,1fr)_minmax(0,1fr)] bg-brand-background px-4 py-3 text-xs font-bold uppercase tracking-wide text-brand-muted sm:grid">
-            <span>Field</span>
-            <span>Current</span>
-            <span>Requested</span>
-          </div>
-          {rows.map((row) => (
-            <div
-              key={row.label}
-              className="grid grid-cols-1 gap-2 border-t border-brand-border px-4 py-4 text-sm sm:grid-cols-[150px_minmax(0,1fr)_minmax(0,1fr)] sm:gap-4"
-            >
-              <p className="font-bold text-brand-black">{row.label}</p>
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-wide text-brand-muted sm:hidden">
-                  Current
-                </p>
-                <p className="mt-1 whitespace-pre-wrap text-brand-muted sm:mt-0">
-                  {row.current || "Not provided"}
-                </p>
-              </div>
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-wide text-brand-muted sm:hidden">
-                  Requested
-                </p>
-                <p className="mt-1 whitespace-pre-wrap font-medium text-brand-black sm:mt-0">
-                  {row.requested || "Not provided"}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="mt-4 text-sm text-brand-muted">
-          No reviewable changes were provided.
-        </p>
-      )}
-    </div>
-  );
-}
-
-function getProfileUpdateRows(lawyer, pending, categoryNames) {
-  const rows = [];
-
-  function add(label, field, formatter = (value) => value) {
-    if (!Object.prototype.hasOwnProperty.call(pending, field)) return;
-    rows.push({
-      label,
-      current: formatter(lawyer[field]),
-      requested: formatter(pending[field]),
-    });
+  async function openDocument(submission, file) {
+    closePreview(); setError("");
+    try {
+      const response = await fetch(`${API_URL}/admin/lawyers/${selected._id}/verification/submissions/${submission._id}/files/${file._id}`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!response.ok) throw new Error("Could not load the document.");
+      setPreview({ url: URL.createObjectURL(await response.blob()), name: fileNames[file.slot] || file.name, type: file.mimeType });
+    } catch (err) { setError(err.message); }
   }
-
-  add("Display name", "displayName");
-  add("Professional title", "professionalTitle");
-
-  if (pending.officeCity || pending.district || pending.province) {
-    rows.push({
-      label: "Office location",
-      current: [lawyer.officeCity, lawyer.district, lawyer.province]
-        .filter(Boolean)
-        .join(", "),
-      requested: [pending.officeCity, pending.district, pending.province]
-        .filter(Boolean)
-        .join(", "),
-    });
+  async function saveDecision(event) {
+    event.preventDefault(); setBusy(true); setError(""); setNotice("");
+    try {
+      const result = await apiRequest(`/admin/lawyers/${selected._id}/decision`, { method: "PATCH", token, body: { decision, reason } });
+      await refresh();
+      const [docs, log] = await Promise.all([apiRequest(`/admin/lawyers/${selected._id}/verification`, { token }), apiRequest(`/admin/lawyers/${selected._id}/activity`, { token })]);
+      setVerification(docs.verification); setHistory(log.entries || []); setSelected((row) => ({ ...row, reviewStatus: decision, isPublished: decision === "approved", rejectionReason: decision === "rejected" ? reason : null })); setNotice(result.message || "Decision saved.");
+    } catch (err) { setError(err.message); } finally { setBusy(false); }
   }
-
-  add(
-    "Primary practice area",
-    "primaryPracticeArea",
-    (value) => categoryNames[value] || value
-  );
-  add(
-    "Practice areas",
-    "practiceAreas",
-    (value) =>
-      Array.isArray(value)
-        ? value.map((area) => categoryNames[area] || area).join(", ")
-        : value
-  );
-  add(
-    "Areas of focus",
-    "subAreas",
-    (value) => (Array.isArray(value) ? value.join(", ") : value)
-  );
-  add("Years of practice", "yearsOfPractice", (value) =>
-    value !== undefined && value !== null ? String(value) : value
-  );
-  add("About", "description");
-
-  return rows;
-}
-
-function Summary({ label, value }) {
-  return (
-    <div className="rounded-2xl border border-brand-border bg-white p-6 shadow-sm">
-      <p className="text-sm font-semibold text-brand-muted">{label}</p>
-      <p className="mt-2 text-3xl font-extrabold">{value}</p>
-    </div>
-  );
-}
-
-function Tab({ active, onClick, children }) {
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={onClick}
-      className={`border-b-2 px-4 py-3 text-sm font-bold ${
-        active
-          ? "border-brand-black text-brand-black"
-          : "border-transparent text-brand-muted"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Detail({ label, value }) {
-  return (
-    <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted">
-        {label}
-      </p>
-      <p className="mt-1 whitespace-pre-wrap text-sm text-brand-black">
-        {value || "Not provided"}
-      </p>
-    </div>
-  );
-}
-
-function Empty({ text }) {
-  return (
-    <p className="rounded-2xl border border-brand-border bg-white p-8 text-brand-muted">
-      {text}
-    </p>
-  );
+  async function addAdmin(event) {
+    event.preventDefault(); setBusy(true); setError(""); setNotice("");
+    try { const result = await apiRequest("/admin/admins", { method: "POST", token, body: newAdmin }); setNewAdmin({ name: "", email: "", password: "" }); setShowAdminForm(false); await refresh(); setNotice(result.message || "Admin created."); }
+    catch (err) { setError(err.message); } finally { setBusy(false); }
+  }
+  async function reload() { setLoading(true); try { await refresh(); setNotice("Data refreshed."); } catch (err) { setError(err.message); } finally { setLoading(false); } }
+  return <main className="min-h-[75vh] bg-brand-background px-4 py-8 sm:px-6 lg:px-8"><div className="mx-auto max-w-7xl">
+    <header className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-extrabold uppercase tracking-widest text-amber-800">Administration</p><h1 className="mt-2 text-3xl font-extrabold">Admin dashboard</h1><p className="mt-2 text-brand-muted">Welcome, {user?.name || "Admin"}. Review lawyers and manage users.</p></div><button className={button} disabled={loading || busy} type="button" onClick={reload}>Refresh</button></header>
+    {error && <p role="alert" className="mt-5 rounded-lg bg-red-50 p-4 text-red-800">{error}</p>}{notice && <p role="status" className="mt-5 rounded-lg bg-green-50 p-4 text-green-800">{notice}</p>}
+    <section aria-label="Lawyer analytics" className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{[["all", "All lawyers"], ["pending", "Pending"], ["resubmitted", "Resubmitted"], ["approved", "Approved"], ["rejected", "Changes requested"]].map(([key, label]) => <button type="button" key={key} onClick={() => { setTab("lawyers"); setFilter(key); closePreview(); setSelected(null); }} className={`rounded-xl border bg-white p-5 text-left shadow-sm hover:border-brand-black ${tab === "lawyers" && filter === key ? "border-brand-black" : "border-brand-border"}`}><p className="text-sm text-brand-muted">{label}</p><p className="mt-2 text-3xl font-extrabold">{loading ? "..." : counts[key]}</p></button>)}</section>
+    <nav aria-label="Admin sections" className="mt-8 flex gap-2 border-b border-brand-border">{[["lawyers", "Lawyer reviews"], ["users", "Users"], ["activity", "Admin activity"]].map(([key, label]) => <button key={key} type="button" onClick={() => setTab(key)} aria-current={tab === key ? "page" : undefined} className={`border-b-2 px-4 py-3 text-sm font-bold ${tab === key ? "border-brand-black" : "border-transparent text-brand-muted"}`}>{label}</button>)}</nav>
+    {tab === "lawyers" && <section className="mt-6"><h2 className="text-xl font-bold">Lawyer profiles</h2><p className="text-sm text-brand-muted">Open a profile in the list to review it.</p><div className="mt-4 flex flex-wrap gap-3"><label className="sr-only" htmlFor="lawyer-search">Search lawyers</label><input id="lawyer-search" type="search" placeholder="Search name, email or practice area" value={query} onChange={(event) => setQuery(event.target.value)} className="w-full max-w-lg rounded-lg border border-brand-border bg-white p-3" /><label className="sr-only" htmlFor="lawyer-filter">Status</label><select id="lawyer-filter" value={filter} onChange={(event) => setFilter(event.target.value)} className="rounded-lg border border-brand-border bg-white p-3"><option value="all">All statuses</option><option value="pending">Pending</option><option value="resubmitted">Resubmitted</option><option value="approved">Approved</option><option value="rejected">Changes requested</option></select></div><p className="my-4 text-sm text-brand-muted">{visible.length} profiles shown</p>
+      <div className="space-y-3">{!visible.length && <p className="rounded-xl border bg-white p-6">No matching lawyers.</p>}{visible.map((row) => <article key={row._id} className="overflow-hidden rounded-xl border border-brand-border bg-white"><button type="button" aria-expanded={selected?._id === row._id} onClick={() => toggleProfile(row)} className="flex w-full flex-wrap items-center justify-between gap-3 p-5 text-left hover:bg-brand-background"><div><div className="flex flex-wrap items-center gap-2"><strong className="text-lg">{row.displayName}</strong><Status value={row.reviewStatus} />{row.resubmitted && <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">Resubmitted</span>}</div><p className="mt-1 text-sm text-brand-muted">{row.userId?.email || row.email} · {row.primaryPracticeArea || "No practice area"} · {row.officeCity || "No city"}</p></div><strong className="text-sm">{selected?._id === row._id ? "Collapse ↑" : "View profile ↓"}</strong></button>
+      {selected?._id === row._id && <div className="border-t border-brand-border p-5 sm:p-7">{detailsLoading ? <p>Loading details...</p> : <><h3 className="text-lg font-bold">Profile details</h3><div className="mt-3 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4"><p><strong>Phone:</strong> {row.phone || "Not provided"}</p><p><strong>Location:</strong> {[row.officeCity, row.district].filter(Boolean).join(", ") || "Not provided"}</p><p><strong>Experience:</strong> {row.yearsOfPractice ?? "Not provided"} years</p><p><strong>Practice areas:</strong> {row.practiceAreas?.join(", ") || "Not provided"}</p></div>{row.description && <p className="mt-4 rounded-lg bg-brand-background p-4 text-sm">{row.description}</p>}
+        {row.pendingProfileChanges && <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm"><h3 className="font-bold">Professional profile update awaiting review</h3><p className="mt-1">The already approved public profile stays live while these requested changes are reviewed.</p><dl className="mt-3 grid gap-2 sm:grid-cols-2">{Object.entries(row.pendingProfileChanges).map(([key, value]) => <div key={key}><dt className="font-semibold">{key.replaceAll(/([A-Z])/g, " $1")}</dt><dd>{Array.isArray(value) ? value.join(", ") : String(value)}</dd></div>)}</dl></div>}
+        <h3 className="mt-7 text-lg font-bold">Verification documents</h3>{!verification?.submissions?.length && <p className="mt-2 rounded-lg bg-amber-50 p-3 text-sm">No documents submitted. New lawyers need a submission before approval.</p>}{verification?.submissions.slice().reverse().map((submission) => <div key={submission._id} className="mt-3 rounded-lg border border-brand-border p-4"><p className="font-semibold">Submission {submission.number} <span className="font-normal text-brand-muted">· {date(submission.submittedAt)}</span></p><p className="mt-1 text-sm">Enrolment: {submission.enrolmentNumber} · {submission.identityType?.toUpperCase()}</p><div className="mt-3 flex flex-wrap gap-2">{submission.files.map((file) => <button type="button" key={file._id} onClick={() => openDocument(submission, file)} className={button}>View {fileNames[file.slot] || file.slot}</button>)}</div></div>)}
+        {preview && <div className="mt-4 rounded-xl border border-brand-border bg-brand-background p-4"><div className="mb-3 flex justify-between gap-2"><h4 className="font-bold">Preview: {preview.name}</h4><button type="button" className={button} onClick={closePreview}>Close</button></div>{preview.type === "application/pdf" ? <iframe title={preview.name} src={preview.url} className="h-[65vh] w-full rounded-lg border bg-white" /> : <img src={preview.url} alt={preview.name} className="max-h-[65vh] max-w-full rounded-lg border bg-white object-contain" />}</div>}
+        <form onSubmit={saveDecision} className="mt-7 rounded-xl border border-brand-border bg-brand-background p-5"><h3 className="text-lg font-bold">Review decision</h3><p className="mt-1 text-sm text-brand-muted">You can correct a decision later. Changes are recorded in profile history.</p><div className="mt-4 grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold">Decision<select value={decision} onChange={(event) => setDecision(event.target.value)} className="mt-2 block w-full rounded-lg border p-3"><option value="pending">Keep pending</option><option value="approved">Approve and publish</option><option value="rejected">Request changes</option></select></label><label className="text-sm font-semibold">Reason<textarea rows={3} maxLength={2000} required={decision === "rejected"} value={reason} onChange={(event) => setReason(event.target.value)} className="mt-2 block w-full rounded-lg border p-3" placeholder="Explain what needs correction" /></label></div>{decision === "approved" && !canApprove && <p className="mt-2 text-sm text-amber-900">Documents must be submitted first.</p>}<button disabled={busy || (decision === "approved" && !canApprove)} className="mt-4 rounded-lg bg-brand-black px-5 py-3 text-sm font-bold text-white disabled:opacity-50">{busy ? "Saving..." : "Save decision"}</button></form>
+        <div className="mt-7"><button className={button} type="button" aria-expanded={showHistory} onClick={() => setShowHistory((open) => !open)}>Profile history ({history.length}) {showHistory ? "↑" : "↓"}</button>{showHistory && <div className="mt-4"><Table headers={["Date", "User", "Action", "Change", "Reason"]} empty="No history yet." rows={history.map((entry) => <tr key={entry._id}><td className={td}>{date(entry.createdAt)}</td><td className={td}>{entry.actorName} ({entry.actorRole})</td><td className={td}>{actionNames[entry.action] || entry.action}</td><td className={td}>{entry.previous?.status || "New"} → {entry.next?.status || "Updated"}</td><td className={td}>{entry.reason || "—"}</td></tr>)} /></div>}</div>
+      </>}</div>}</article>)}</div></section>}
+    {tab === "activity" && <section className="mt-6"><h2 className="mb-4 text-xl font-bold">Admin activity</h2><Table headers={["Date", "Admin", "Action", "Lawyer", "Change", "Reason"]} empty="No admin actions recorded." rows={activity.map((entry) => <tr key={entry._id}><td className={td}>{date(entry.createdAt)}</td><td className={td}>{entry.actorName}</td><td className={td}>{actionNames[entry.action] || entry.action}</td><td className={td}>{entry.lawyer ? names[String(entry.lawyer)] || "Lawyer profile" : "—"}</td><td className={td}>{entry.previous?.status || "New"} → {entry.next?.status || entry.next?.name || "Updated"}</td><td className={td}>{entry.reason || "—"}</td></tr>)} /></section>}
+    {tab === "users" && <section className="mt-6"><h2 className="text-xl font-bold">Users</h2><div className="my-5 flex flex-wrap gap-2">{[["clients", clients.length], ["lawyers", lawyers.length], ["admins", admins.length]].map(([key, count]) => <button key={key} type="button" onClick={() => setUserTab(key)} className={`${button} ${userTab === key ? "border-brand-black" : ""}`}>{key[0].toUpperCase() + key.slice(1)} ({count})</button>)}</div>
+      {userTab === "clients" && <Table headers={["Name", "Email", "Registered"]} empty="No clients registered." rows={clients.map((row) => <tr key={row._id}><td className={td}>{row.name}</td><td className={td}>{row.email}</td><td className={td}>{date(row.createdAt)}</td></tr>)} />}
+      {userTab === "lawyers" && <Table headers={["Name", "Email", "Status", "Registered"]} empty="No lawyers registered." rows={lawyers.map((row) => <tr key={row._id}><td className={td}>{row.displayName}</td><td className={td}>{row.userId?.email || row.email}</td><td className={td}><Status value={row.reviewStatus} /></td><td className={td}>{date(row.createdAt)}</td></tr>)} />}
+      {userTab === "admins" && <><div className="mb-4 flex justify-end"><button type="button" className={button} onClick={() => setShowAdminForm((open) => !open)}>{showAdminForm ? "Cancel" : "Add admin"}</button></div>{showAdminForm && <form onSubmit={addAdmin} className="mb-5 max-w-xl space-y-4 rounded-xl border bg-white p-5"><h3 className="font-bold">Add an admin</h3>{[["name", "Full name", "text"], ["email", "Email", "email"], ["password", "Password", "password"]].map(([key, label, type]) => <label key={key} className="block text-sm font-semibold">{label}<input type={type} required minLength={key === "password" ? 8 : undefined} value={newAdmin[key]} onChange={(event) => setNewAdmin((old) => ({ ...old, [key]: event.target.value }))} className="mt-2 block w-full rounded-lg border p-3" /></label>)}<button disabled={busy} className="rounded-lg bg-brand-black px-5 py-3 font-bold text-white disabled:opacity-50">Create admin</button></form>}<Table headers={["Name", "Email", "Created"]} empty="No admins found." rows={admins.map((row) => <tr key={row._id}><td className={td}>{row.name}</td><td className={td}>{row.email}</td><td className={td}>{date(row.createdAt)}</td></tr>)} /></>}
+    </section>}
+  </div></main>;
 }
