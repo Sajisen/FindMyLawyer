@@ -38,6 +38,30 @@ export const getPublicCategories = async (req, res) => {
 // can keep them canonical.
 export const getPublicLocations = async (req, res) => {
   try {
+    const level = String(req.query.level || "");
+    if (level && !["provinces", "districts", "cities"].includes(level)) {
+      return res.status(400).json({ message: "Invalid location level." });
+    }
+    if (level === "provinces") {
+      const provinces = await Location.distinct("province", { isActive: true });
+      return res.json({ provinces: provinces.sort() });
+    }
+    if (level === "districts") {
+      const province = String(req.query.province || "");
+      if (!province) return res.status(400).json({ message: "Province is required." });
+      const districts = await Location.distinct("district", { province, isActive: true });
+      return res.json({ districts: districts.sort() });
+    }
+    if (level === "cities") {
+      const province = String(req.query.province || "");
+      const district = String(req.query.district || "");
+      if (!province || !district) return res.status(400).json({ message: "Province and district are required." });
+      const locations = await Location.find({ province, district, isActive: true })
+        .select("city district province").sort({ city: 1 }).lean();
+      return res.json({ locations: locations.map((item) => ({
+        id: String(item._id), city: item.city, district: item.district, province: item.province,
+      })) });
+    }
     const query = String(req.query.query || "").trim();
     const filter = { isActive: true };
 

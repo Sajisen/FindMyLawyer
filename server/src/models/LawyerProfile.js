@@ -38,6 +38,11 @@ const lawyerProfileSchema = new mongoose.Schema(
       trim: true,
     },
 
+    normalizedPhone: {
+      type: String,
+      trim: true,
+    },
+
     officeCity: {
       type: String,
       trim: true,
@@ -153,6 +158,14 @@ const lawyerProfileSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+  }
+);
+
+lawyerProfileSchema.index(
+  { normalizedPhone: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { isDemo: false, normalizedPhone: { $type: "string" } },
   }
 );
 

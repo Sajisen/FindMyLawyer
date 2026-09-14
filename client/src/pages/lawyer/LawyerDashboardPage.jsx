@@ -146,6 +146,7 @@ export default function LawyerDashboardPage() {
                   View public profile
                 </Link>
               )}
+              <Link to="/lawyer/verification" className="rounded-xl border border-brand-border bg-white px-4 py-2.5 text-sm font-bold text-brand-black">Verification documents</Link>
               <Link
                 to="/profile/edit"
                 className="rounded-xl bg-brand-yellow px-5 py-2.5 text-sm font-bold text-brand-black transition hover:bg-brand-yellow-dark"

@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 import User from "../models/User.js";
 import LawyerProfile from "../models/LawyerProfile.js";
+import { normalizeSriLankanPhone, isPhoneInUse, isPhoneDuplicateError } from "../services/lawyerPhone.js";
 import {
   ProfileValidationError,
   parseYearsOfPractice,
@@ -140,8 +141,8 @@ export const registerLawyer = async (req, res) => {
     const phone = String(req.body.phone || "").trim();
 
     if (
-      !name ||
-      !email ||
+      !name?.trim() ||
+      !email?.trim() ||
       !password ||
       !displayName ||
       !professionalTitle ||
@@ -165,6 +166,10 @@ export const registerLawyer = async (req, res) => {
         message: "Password must be at least 8 characters long.",
       });
     }
+
+    const normalizedPhone = normalizeSriLankanPhone(phone);
+    if (!normalizedPhone) return res.status(400).json({ message: "Enter a valid Sri Lankan phone number." });
+    if (await isPhoneInUse(normalizedPhone)) return res.status(409).json({ message: "This phone number is already registered." });
 
     const [location, practiceAreaData] = await Promise.all([
       resolveControlledLocation({ locationId, officeCity }),
@@ -212,6 +217,7 @@ export const registerLawyer = async (req, res) => {
       professionalTitle,
       email,
       phone,
+      normalizedPhone,
       province: location.province,
       district: location.district,
       officeCity: location.city,
@@ -266,10 +272,9 @@ export const registerLawyer = async (req, res) => {
       });
     }
 
+    if (isPhoneDuplicateError(error)) return res.status(409).json({ message: "This phone number is already registered." });
     if (isDuplicateKeyError(error)) {
-      return res.status(409).json({
-        message: "An account with this email already exists.",
-      });
+      return res.status(409).json({ message: "An account with this email already exists." });
     }
 
     console.error("Lawyer registration error:", error);
