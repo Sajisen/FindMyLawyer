@@ -65,6 +65,20 @@ export function AuthProvider({ children }) {
     return data.user;
   }
 
+  async function register(role, details) {
+    if (!['client', 'lawyer'].includes(role)) {
+      throw new Error('Invalid registration type.');
+    }
+    const data = await apiRequest(`/auth/register/${role}`, {
+      method: 'POST',
+      body: details,
+    });
+    localStorage.setItem('token', data.token);
+    setToken(data.token);
+    setUser(data.user);
+    return data;
+  }
+
   function logout() {
     localStorage.removeItem("token");
 
@@ -79,6 +93,7 @@ export function AuthProvider({ children }) {
         token,
         loading,
         login,
+        register,
         logout,
         isAuthenticated: Boolean(user),
       }}
