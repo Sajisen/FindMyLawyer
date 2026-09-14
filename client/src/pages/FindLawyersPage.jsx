@@ -1,15 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 import SearchModeTabs from "../features/search/components/SearchModeTabs.jsx";
 import ManualSearchPanel from "../features/search/components/ManualSearchPanel.jsx";
 import AdvancedSearchPanel from "../features/search/components/AdvancedSearchPanel.jsx";
 import LawyerCard from "../features/lawyers/components/LawyerCard.jsx";
 import Pagination from "../features/lawyers/components/Pagination.jsx";
+import SearchResultsViewToggle from "../features/lawyers/components/SearchResultsViewToggle.jsx";
 import { searchLawyers } from "../features/lawyers/lawyerApi.js";
 import useLegalCategories from "../features/search/hooks/useLegalCategories.js";
+import {
+  clearSearchReturnState,
+  readSearchReturnState,
+  rememberSearchReturnState,
+} from "../features/search/utils/searchReturnState.js";
 
 const RESULTS_PER_PAGE = 10;
+const VIEW_STORAGE_KEY = "findmylawyer.searchResultsView.v1";
 
 const EMPTY_FILTERS = {
   category: "",
@@ -29,6 +36,14 @@ const EMPTY_PAGINATION = {
   hasPreviousPage: false,
   hasNextPage: false,
 };
+
+function getInitialViewMode() {
+  try {
+    return localStorage.getItem(VIEW_STORAGE_KEY) === "grid" ? "grid" : "list";
+  } catch {
+    return "list";
+  }
+}
 
 function copyFilters(filters) {
   return {
@@ -116,11 +131,14 @@ function getSearchParamsFromFilters(filters, page = 1) {
 }
 
 export default function FindLawyersPage() {
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const paramsKey = searchParams.toString();
+  const currentPath = `${location.pathname}${location.search}`;
   const { categories } = useLegalCategories();
 
   const [searchMode, setSearchMode] = useState("manual");
+  const [viewMode, setViewMode] = useState(getInitialViewMode);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState(null);
   const [manualNotice, setManualNotice] = useState("");
@@ -136,6 +154,13 @@ export default function FindLawyersPage() {
   const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
   const lastAutoSearchKeyRef = useRef("");
+  const restoredUiRef = useRef(false);
+  const restoredScrollRef = useRef(false);
+  const returnStateRef = useRef(undefined);
+
+  if (returnStateRef.current === undefined) {
+    returnStateRef.current = readSearchReturnState(currentPath);
+  }
 
   const runManualSearch = useCallback(async (searchFilters, page = 1) => {
     const snapshot = copyFilters(searchFilters);
@@ -160,9 +185,7 @@ export default function FindLawyersPage() {
       setResultCount(0);
       setSearchMeta({});
       setPagination(EMPTY_PAGINATION);
-      setError(
-        searchError.message || "Something went wrong while searching."
-      );
+      setError(searchError.message || "Something went wrong while searching.");
     } finally {
       setLoading(false);
     }
@@ -175,9 +198,25 @@ export default function FindLawyersPage() {
     const hasMainFilter = Boolean(
       nextFilters.category || nextFilters.locationId || nextFilters.location
     );
+    const returnState = returnStateRef.current;
 
-    setFilters(nextFilters);
-    setSearchMode("manual");
+    if (returnState && !restoredUiRef.current) {
+      restoredUiRef.current = true;
+      setFilters(returnState.filters ? copyFilters(returnState.filters) : nextFilters);
+      setSearchMode(returnState.searchMode || "manual");
+      setManualNotice(returnState.manualNotice || "");
+      if (returnState.viewMode === "grid" || returnState.viewMode === "list") {
+        setViewMode(returnState.viewMode);
+      }
+      if (returnState.advancedSearch?.description !== undefined) {
+        setAdvancedSearch({
+          description: String(returnState.advancedSearch.description || ""),
+        });
+      }
+    } else {
+      setFilters(nextFilters);
+      setSearchMode("manual");
+    }
 
     if (
       params.get("search") === "1" &&
@@ -188,6 +227,44 @@ export default function FindLawyersPage() {
       runManualSearch(nextFilters, nextPage);
     }
   }, [paramsKey, runManualSearch]);
+
+  useEffect(() => {
+    const returnState = returnStateRef.current;
+
+    const waitingForPreviousResults =
+      Boolean(returnState?.hadSearch) && (!hasSearched || loading);
+
+    if (
+      !returnState ||
+      restoredScrollRef.current ||
+      waitingForPreviousResults ||
+      (!returnState.hadSearch && loading)
+    ) {
+      return undefined;
+    }
+
+    restoredScrollRef.current = true;
+    let secondFrame = null;
+
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        window.scrollTo({
+          top: Math.max(0, Number(returnState.scrollY) || 0),
+          left: 0,
+          behavior: "auto",
+        });
+        clearSearchReturnState();
+        returnStateRef.current = null;
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      if (secondFrame !== null) {
+        window.cancelAnimationFrame(secondFrame);
+      }
+    };
+  }, [error, hasSearched, lawyers.length, loading, resultCount]);
 
   function submitFilters(nextFilters, page = 1) {
     const nextParams = getSearchParamsFromFilters(nextFilters, page);
@@ -263,6 +340,34 @@ export default function FindLawyersPage() {
     });
   }
 
+  function handleViewModeChange(nextMode) {
+    if (nextMode !== "list" && nextMode !== "grid") {
+      return;
+    }
+
+    setViewMode(nextMode);
+
+    try {
+      localStorage.setItem(VIEW_STORAGE_KEY, nextMode);
+    } catch {
+      // The selected view still works for the current session if storage is unavailable.
+    }
+  }
+
+  function handleOpenProfile() {
+    rememberSearchReturnState({
+      path: currentPath,
+      scrollY: window.scrollY,
+      filters: copyFilters(filters),
+      appliedFilters: appliedFilters ? copyFilters(appliedFilters) : null,
+      searchMode,
+      manualNotice,
+      viewMode,
+      advancedSearch,
+      hadSearch: hasSearched,
+    });
+  }
+
   const hasPendingChanges =
     hasSearched &&
     appliedFilters !== null &&
@@ -321,30 +426,44 @@ export default function FindLawyersPage() {
           <section className="min-w-0">
             <div className="overflow-hidden rounded-2xl border border-brand-border bg-white">
               <div className="border-b border-brand-border px-5 py-5 sm:px-6">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
-                  <h2 className="text-lg font-bold text-brand-black">
-                    Search Results
-                  </h2>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="text-lg font-bold text-brand-black">
+                      Search Results
+                    </h2>
 
-                  {hasSearched && !loading && !error && resultCount > 0 && (
-                    <div className="text-sm font-medium text-brand-muted sm:text-right">
-                      <p>
-                        Showing {firstResult} to {lastResult} of {resultCount}{" "}
-                        matching {resultCount === 1 ? "profile" : "profiles"}
-                      </p>
-
-                      {searchMeta.locationFound && (
-                        <p className="mt-1 text-xs font-normal">
-                          {searchMeta.locationRelevantCount} nearby
-                          {searchMeta.onlineFallbackCount > 0
-                            ? ` · ${searchMeta.onlineFallbackCount} online ${
-                                searchMeta.onlineFallbackCount === 1
-                                  ? "alternative"
-                                  : "alternatives"
-                              }`
-                            : " · ranked by city, district and province"}
+                    {hasSearched && !loading && !error && resultCount > 0 && (
+                      <div className="mt-1 text-sm font-medium text-brand-muted">
+                        <p>
+                          Showing {firstResult} to {lastResult} of {resultCount}{" "}
+                          matching {resultCount === 1 ? "profile" : "profiles"}
                         </p>
-                      )}
+
+                        {searchMeta.locationFound && (
+                          <p className="mt-1 text-xs font-normal">
+                            {searchMeta.locationRelevantCount} nearby
+                            {searchMeta.onlineFallbackCount > 0
+                              ? ` · ${searchMeta.onlineFallbackCount} online ${
+                                  searchMeta.onlineFallbackCount === 1
+                                    ? "alternative"
+                                    : "alternatives"
+                                }`
+                              : " · ranked by city, district and province"}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {!loading && !error && lawyers.length > 0 && (
+                    <div className="flex items-center gap-3 self-start sm:self-auto">
+                      <span className="hidden text-xs font-semibold text-brand-muted sm:inline">
+                        View
+                      </span>
+                      <SearchResultsViewToggle
+                        value={viewMode}
+                        onChange={handleViewModeChange}
+                      />
                     </div>
                   )}
                 </div>
@@ -431,12 +550,20 @@ export default function FindLawyersPage() {
 
               {!loading && !error && lawyers.length > 0 && (
                 <>
-                  <div className="space-y-4 bg-brand-background/60 p-4 sm:p-6">
+                  <div
+                    className={
+                      viewMode === "grid"
+                        ? "grid gap-4 bg-brand-background/60 p-4 md:grid-cols-2 sm:p-6"
+                        : "space-y-4 bg-brand-background/60 p-4 sm:p-6"
+                    }
+                  >
                     {lawyers.map((lawyer) => (
                       <LawyerCard
                         key={lawyer._id}
                         lawyer={lawyer}
                         categories={categories}
+                        variant={viewMode}
+                        onOpenProfile={handleOpenProfile}
                       />
                     ))}
                   </div>

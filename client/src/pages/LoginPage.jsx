@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   Link,
+  useLocation,
   useNavigate,
 } from "react-router-dom";
 
@@ -8,6 +9,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
 
   const [form, setForm] = useState({
@@ -40,17 +42,19 @@ export default function LoginPage() {
         form.password
       );
 
+      if (location.state?.from) {
+        navigate(location.state.from, { replace: true });
+        return;
+      }
+
       if (user.role === "admin") {
-        navigate("/admin");
+        navigate("/admin", { replace: true });
         return;
       }
 
-      if (user.role === "lawyer") {
-        navigate("/lawyer");
-        return;
-      }
-
-      navigate("/");
+      // Client and lawyer sign-ins land on Home by default. Their profile is
+      // available from the account menu in the navigation bar.
+      navigate("/", { replace: true });
     } catch (error) {
       setError(error.message);
     } finally {

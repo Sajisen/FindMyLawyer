@@ -3,20 +3,36 @@ import bcrypt from "bcryptjs";
 
 import LawyerProfile from "../models/LawyerProfile.js";
 import User from "../models/User.js";
+import { applyPendingProfileChanges } from "../services/lawyerProfileReviewService.js";
 
-// GET ALL LAWYERS WAITING FOR ADMIN APPROVAL
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_REJECTION_REASON_LENGTH = 2000;
+
+function isDuplicateKeyError(error) {
+  return error?.code === 11000;
+}
+
+// GET NEW LAWYER APPLICATIONS AND APPROVED-PROFILE UPDATE REQUESTS
 export const getPendingLawyers = async (req, res) => {
   try {
     const lawyers = await LawyerProfile.find({
       isDemo: { $ne: true },
-      isPublished: false,
       $or: [
-        { rejectionReason: null },
-        { rejectionReason: { $exists: false } },
+        {
+          isPublished: false,
+          $or: [
+            { rejectionReason: null },
+            { rejectionReason: { $exists: false } },
+          ],
+        },
+        {
+          isPublished: true,
+          pendingProfileChanges: { $ne: null },
+        },
       ],
     })
       .populate("userId", "name email role")
-      .sort({ createdAt: -1 });
+      .sort({ updatedAt: -1 });
 
     return res.json({
       count: lawyers.length,
@@ -31,8 +47,7 @@ export const getPendingLawyers = async (req, res) => {
   }
 };
 
-
-// APPROVE LAWYER
+// APPROVE A NEW LAWYER OR AN APPROVED LAWYER'S PENDING MATERIAL CHANGES
 export const approveLawyer = async (req, res) => {
   try {
     const { id } = req.params;
@@ -54,8 +69,41 @@ export const approveLawyer = async (req, res) => {
       });
     }
 
+    const isProfileUpdate = Boolean(
+      lawyer.isPublished && lawyer.pendingProfileChanges
+    );
+
+    if (isProfileUpdate) {
+      const applied = applyPendingProfileChanges(lawyer);
+
+      if (!applied) {
+        return res.status(400).json({
+          message: "This lawyer has no pending profile changes to approve.",
+        });
+      }
+
+      lawyer.verifiedAt = new Date();
+      lawyer.verifiedBy = req.user.userId;
+      await lawyer.save();
+
+      return res.json({
+        message: "Lawyer profile update approved successfully.",
+        reviewType: "profile_update",
+        lawyer: {
+          id: lawyer._id,
+          displayName: lawyer.displayName,
+          isPublished: lawyer.isPublished,
+          verifiedAt: lawyer.verifiedAt,
+          verifiedBy: lawyer.verifiedBy,
+        },
+      });
+    }
+
     lawyer.isPublished = true;
     lawyer.rejectionReason = null;
+    lawyer.profileUpdateRejectionReason = null;
+    lawyer.pendingProfileChanges = null;
+    lawyer.pendingProfileChangesSubmittedAt = null;
     lawyer.verifiedAt = new Date();
     lawyer.verifiedBy = req.user.userId;
 
@@ -63,6 +111,7 @@ export const approveLawyer = async (req, res) => {
 
     return res.json({
       message: "Lawyer approved and published successfully.",
+      reviewType: "new_application",
       lawyer: {
         id: lawyer._id,
         displayName: lawyer.displayName,
@@ -80,8 +129,7 @@ export const approveLawyer = async (req, res) => {
   }
 };
 
-
-// REJECT LAWYER
+// REJECT A NEW LAWYER OR A PENDING UPDATE WHILE KEEPING AN APPROVED PROFILE LIVE
 export const rejectLawyer = async (req, res) => {
   try {
     const { id } = req.params;
@@ -93,9 +141,17 @@ export const rejectLawyer = async (req, res) => {
       });
     }
 
-    if (!reason || !reason.trim()) {
+    const normalizedReason = String(reason || "").trim();
+
+    if (!normalizedReason) {
       return res.status(400).json({
         message: "A rejection reason is required.",
+      });
+    }
+
+    if (normalizedReason.length > MAX_REJECTION_REASON_LENGTH) {
+      return res.status(400).json({
+        message: `Rejection reason must be ${MAX_REJECTION_REASON_LENGTH} characters or fewer.`,
       });
     }
 
@@ -110,8 +166,34 @@ export const rejectLawyer = async (req, res) => {
       });
     }
 
+    const isProfileUpdate = Boolean(
+      lawyer.isPublished && lawyer.pendingProfileChanges
+    );
+
+    if (isProfileUpdate) {
+      lawyer.pendingProfileChanges = null;
+      lawyer.pendingProfileChangesSubmittedAt = null;
+      lawyer.profileUpdateRejectionReason = normalizedReason;
+
+      // Keep the previously approved profile public and its existing
+      // verification metadata intact.
+      await lawyer.save();
+
+      return res.json({
+        message:
+          "Profile update rejected. The lawyer's previously approved public profile remains active.",
+        reviewType: "profile_update",
+        lawyer: {
+          id: lawyer._id,
+          displayName: lawyer.displayName,
+          isPublished: lawyer.isPublished,
+          profileUpdateRejectionReason: lawyer.profileUpdateRejectionReason,
+        },
+      });
+    }
+
     lawyer.isPublished = false;
-    lawyer.rejectionReason = reason.trim();
+    lawyer.rejectionReason = normalizedReason;
     lawyer.verifiedAt = null;
     lawyer.verifiedBy = null;
 
@@ -119,6 +201,7 @@ export const rejectLawyer = async (req, res) => {
 
     return res.json({
       message: "Lawyer application rejected.",
+      reviewType: "new_application",
       lawyer: {
         id: lawyer._id,
         displayName: lawyer.displayName,
@@ -137,11 +220,19 @@ export const rejectLawyer = async (req, res) => {
 
 export const createAdmin = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const name = String(req.body.name || "").trim();
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const password = String(req.body.password || "");
 
     if (!name || !email || !password) {
       return res.status(400).json({
         message: "Name, email and password are required.",
+      });
+    }
+
+    if (!EMAIL_PATTERN.test(email)) {
+      return res.status(400).json({
+        message: "Please provide a valid email address.",
       });
     }
 
@@ -151,11 +242,7 @@ export const createAdmin = async (req, res) => {
       });
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
-
-    const existingUser = await User.findOne({
-      email: normalizedEmail,
-    });
+    const existingUser = await User.findOne({ email }).select("_id").lean();
 
     if (existingUser) {
       return res.status(409).json({
@@ -166,8 +253,8 @@ export const createAdmin = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 12);
 
     const admin = await User.create({
-      name: name.trim(),
-      email: normalizedEmail,
+      name,
+      email,
       passwordHash,
       role: "admin",
     });
@@ -182,6 +269,12 @@ export const createAdmin = async (req, res) => {
       },
     });
   } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      return res.status(409).json({
+        message: "An account with this email already exists.",
+      });
+    }
+
     console.error("Create admin error:", error);
 
     return res.status(500).json({

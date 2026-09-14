@@ -8,6 +8,7 @@ import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import metaRoutes from "./routes/metaRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
+import savedLawyerRoutes from "./routes/savedLawyerRoutes.js";
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use("/api/lawyers", lawyerRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/meta", metaRoutes);
+app.use("/api/saved-lawyers", savedLawyerRoutes);
 app.use("/api/ai", aiHourlyLimiter, aiBurstLimiter, aiRoutes);
 
 export default app;

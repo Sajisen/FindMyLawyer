@@ -36,3 +36,14 @@ export async function searchLawyers(filters, { page = 1, limit = 10 } = {}) {
 
   return apiRequest(`/lawyers?${params.toString()}`);
 }
+
+export function getLawyerById(lawyerId) {
+  return apiRequest(`/lawyers/${lawyerId}`);
+}
+
+export function getLawyersByIds(lawyerIds = []) {
+  return apiRequest("/lawyers/batch", {
+    method: "POST",
+    body: { lawyerIds },
+  });
+}

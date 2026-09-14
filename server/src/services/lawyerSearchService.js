@@ -1,39 +1,12 @@
 import LawyerProfile from "../models/LawyerProfile.js";
 import {
+  PUBLIC_LAWYER_PROJECT,
+  PUBLIC_LAWYER_VISIBILITY,
+} from "./publicLawyerService.js";
+import {
   getActiveLegalCategory,
   getActiveLocation,
 } from "./searchMetadataService.js";
-
-const PUBLIC_VISIBILITY = {
-  $or: [
-    {
-      isDemo: true,
-      verificationStatus: "demo_verified",
-    },
-    {
-      isDemo: { $ne: true },
-      isPublished: true,
-    },
-  ],
-};
-
-const PUBLIC_PROJECT = {
-  displayName: 1,
-  professionalTitle: 1,
-  email: 1,
-  phone: 1,
-  officeCity: 1,
-  district: 1,
-  province: 1,
-  primaryPracticeArea: 1,
-  practiceAreas: 1,
-  subAreas: 1,
-  languages: 1,
-  consultationModes: 1,
-  yearsOfPractice: 1,
-  description: 1,
-  acceptingNewClients: 1,
-};
 
 export class SearchValidationError extends Error {
   constructor(message) {
@@ -223,7 +196,7 @@ export async function searchPublicLawyers({
     }
   }
 
-  const conditions = [PUBLIC_VISIBILITY];
+  const conditions = [PUBLIC_LAWYER_VISIBILITY];
 
   if (canonicalPracticeArea) {
     conditions.push({
@@ -344,7 +317,7 @@ export async function searchPublicLawyers({
         { $limit: safeLimit },
         {
           $project: {
-            ...PUBLIC_PROJECT,
+            ...PUBLIC_LAWYER_PROJECT,
             relevanceScore: 1,
             match: {
               matchedPracticeArea: {
