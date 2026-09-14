@@ -16,6 +16,7 @@ import RegisterLawyerPage from "./pages/RegisterLawyerPage.jsx";
 
 import LawyerDashboardPage from "./pages/lawyer/LawyerDashboardPage.jsx";
 import EditLawyerProfilePage from "./pages/lawyer/EditLawyerProfilePage.jsx";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage.jsx";
 
 function App() {
   return (
@@ -65,6 +66,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+      
+      <Route
+  path="/admin"
+  element={
+    <ProtectedRoute roles={["admin"]}>
+      <AdminDashboardPage />
+    </ProtectedRoute>
+  }
+/>
+
+
+
       </Routes>
 
       <Footer />

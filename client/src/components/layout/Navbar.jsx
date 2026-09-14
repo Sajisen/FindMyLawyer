@@ -29,7 +29,11 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-brand-border bg-white/95 backdrop-blur">
       <div className="relative mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
-        <Link to="/" onClick={closeMenu} className="flex items-center gap-3">
+        <Link
+          to="/"
+          onClick={closeMenu}
+          className="flex items-center gap-3"
+        >
           <img
             src={logoIcon}
             alt="FindMyLawyer"
@@ -57,6 +61,15 @@ export default function Navbar() {
               {user.role === "lawyer" && (
                 <Link
                   to="/lawyer"
+                  className="rounded-lg px-4 py-2.5 text-sm font-semibold text-brand-black transition hover:bg-brand-background"
+                >
+                  Dashboard
+                </Link>
+              )}
+
+              {user.role === "admin" && (
+                <Link
+                  to="/admin"
                   className="rounded-lg px-4 py-2.5 text-sm font-semibold text-brand-black transition hover:bg-brand-background"
                 >
                   Dashboard
@@ -126,6 +139,16 @@ export default function Navbar() {
                 {user.role === "lawyer" && (
                   <Link
                     to="/lawyer"
+                    onClick={closeMenu}
+                    className="rounded-lg px-3 py-2.5 text-sm font-semibold text-brand-black hover:bg-brand-background"
+                  >
+                    Dashboard
+                  </Link>
+                )}
+
+                {user.role === "admin" && (
+                  <Link
+                    to="/admin"
                     onClick={closeMenu}
                     className="rounded-lg px-3 py-2.5 text-sm font-semibold text-brand-black hover:bg-brand-background"
                   >
