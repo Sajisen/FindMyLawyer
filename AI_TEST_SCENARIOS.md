@@ -271,7 +271,7 @@ Expected:
 ```
 
 Expected:
-- Rejected by the server before a DeepSeek request is made
+- Rejected by the server before a paid AI-provider request is made
 - UI error should say to describe the legal situation in plain language instead of sending code or markup
 
 ## Manual Search behavior tests
@@ -289,4 +289,4 @@ Expected:
 
 ## Optional rate-limit test without spending AI credits
 
-The AI endpoint is limited to 10 requests per minute and 60 per hour per connection. If you want to verify the short burst limit, use an input that is rejected by the local code/markup guard so the request does not need a DeepSeek completion. After enough rapid requests, the server should return HTTP 429 with a wait message.
+The AI endpoint is limited to 10 requests per minute and 60 per hour per connection. If you want to verify the short burst limit, use an input that is rejected by the local code/markup guard so the request does not need a paid AI-provider completion. After enough rapid requests, the server should return HTTP 429 with a wait message.
