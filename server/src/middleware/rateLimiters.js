@@ -20,3 +20,16 @@ export const registrationLimiter = rateLimit({
     message: "Too many registration attempts. Please wait and try again later.",
   },
 });
+
+
+export const verificationUploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 12,
+  keyGenerator: (req) => String(req.user.userId),
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    message:
+      "Too many verification submissions were sent. Please wait and try again later.",
+  },
+});

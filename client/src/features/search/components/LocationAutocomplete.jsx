@@ -18,15 +18,14 @@ export default function LocationAutocomplete({
   const requestIdRef = useRef(0);
 
   useEffect(() => {
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
+
     if (disabled) {
-      setOpen(false);
       return undefined;
     }
 
     const timeoutId = window.setTimeout(async () => {
-      const requestId = requestIdRef.current + 1;
-      requestIdRef.current = requestId;
-
       try {
         setLoading(true);
         setError("");
@@ -55,6 +54,9 @@ export default function LocationAutocomplete({
     return () => window.clearTimeout(timeoutId);
   }, [disabled, value]);
 
+  const dropdownOpen = open && !disabled;
+  const isLoading = loading && !disabled;
+
   function chooseLocation(location) {
     onChange(location.city);
     onSelect?.(location);
@@ -81,20 +83,20 @@ export default function LocationAutocomplete({
         disabled={disabled}
         role="combobox"
         aria-autocomplete="list"
-        aria-expanded={open}
+        aria-expanded={dropdownOpen}
         aria-controls={`${id}-options`}
         className="h-12 w-full rounded-xl border border-brand-border bg-white px-4 pr-10 text-sm text-brand-black outline-none transition placeholder:text-neutral-400 focus:border-brand-yellow-dark focus:ring-2 focus:ring-brand-yellow/20 disabled:cursor-not-allowed disabled:bg-neutral-100"
       />
 
       <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-brand-muted">
-        {loading ? (
+        {isLoading ? (
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand-border border-t-brand-black" />
         ) : (
           <ChevronDownIcon />
         )}
       </div>
 
-      {open && !disabled && (
+      {dropdownOpen && (
         <div
           id={`${id}-options`}
           role="listbox"

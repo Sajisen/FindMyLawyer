@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 
 import LawyerCard from "../features/lawyers/components/LawyerCard.jsx";
-import { useSavedLawyers } from "../context/SavedLawyersContext.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useSavedLawyers } from "../context/useSavedLawyers.js";
+import { useAuth } from "../context/useAuth.js";
 import useLegalCategories from "../features/search/hooks/useLegalCategories.js";
 
 export default function SavedLawyersPage() {

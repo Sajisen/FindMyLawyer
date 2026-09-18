@@ -1,5 +1,9 @@
-export const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const configuredApiUrl =
+  import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
+
+export const API_URL = (
+  configuredApiUrl || "http://localhost:5000/api"
+).replace(/\/+$/, "");
 
 export async function apiRequest(
   endpoint,
@@ -23,18 +27,10 @@ export async function apiRequest(
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  let data = {};
-
-  try {
-    data = await response.json();
-  } catch {
-    data = {};
-  }
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(
-      data.message || "Something went wrong."
-    );
+    throw new Error(data?.message || "Something went wrong.");
   }
 
   return data;

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useSavedLawyers } from "../../../context/SavedLawyersContext.jsx";
+import { useSavedLawyers } from "../../../context/useSavedLawyers.js";
 
 export default function SaveLawyerButton({
   lawyer,

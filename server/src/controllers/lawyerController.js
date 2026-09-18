@@ -26,6 +26,9 @@ import {
   buildPendingProfileChanges,
   splitProfileUpdates,
 } from "../services/lawyerProfileReviewService.js";
+import {
+  shouldRequeueVerificationAfterProfileEdit,
+} from "../services/verificationWorkflowService.js";
 
 const MAX_BATCH_LAWYERS = 100;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -268,26 +271,99 @@ export const updateMyLawyerProfile = async (req, res) => {
     profile.pendingProfileChangesSubmittedAt = null;
     profile.profileUpdateRejectionReason = null;
 
+    let rejectedVerification = null;
+    let requeuedFromProfileEdit = false;
+    let requiresDocumentResubmission = false;
+
     if (wasRejected) {
-      const verification = await Verification.findOne({ lawyer: profile._id, status: "rejected" });
-      if (verification) { verification.status = "pending"; verification.reason = ""; await verification.save(); }
+      rejectedVerification = await Verification.findOne({
+        lawyer: profile._id,
+        status: "rejected",
+      });
+
+      requeuedFromProfileEdit = rejectedVerification
+        ? shouldRequeueVerificationAfterProfileEdit(rejectedVerification)
+        : true;
+      requiresDocumentResubmission = Boolean(
+        rejectedVerification && !requeuedFromProfileEdit
+      );
+
       profile.isPublished = false;
-      profile.rejectionReason = null;
       profile.verifiedAt = null;
       profile.verifiedBy = null;
+
+      // Profile-only corrections can be returned to the admin queue as soon as
+      // the lawyer fixes the profile. Document/both rejections remain rejected
+      // until corrected verification files are explicitly resubmitted.
+      if (requeuedFromProfileEdit) {
+        profile.rejectionReason = null;
+      }
     }
 
-    await profile.save();
-    const actor = await User.findById(req.user.userId).select("name");
-    await ActivityLog.create({ actor: req.user.userId, actorName: actor?.name || "Lawyer", actorRole: "lawyer", lawyer: profile._id, action: "profile_updated", previous, next: validatedUpdates });
+    const actor = await User.findById(req.user.userId).select("name").lean();
+
+    if (requeuedFromProfileEdit && rejectedVerification) {
+      const session = await mongoose.startSession();
+
+      try {
+        await session.withTransaction(async () => {
+          profile.$session(session);
+          rejectedVerification.$session(session);
+
+          rejectedVerification.status = "pending";
+          rejectedVerification.reason = "";
+          rejectedVerification.rejectionScope = undefined;
+          rejectedVerification.reviewedBy = undefined;
+          rejectedVerification.reviewedAt = undefined;
+
+          await rejectedVerification.save({ session });
+          await profile.save({ session });
+          await ActivityLog.create(
+            [
+              {
+                actor: req.user.userId,
+                actorName: actor?.name || "Lawyer",
+                actorRole: "lawyer",
+                lawyer: profile._id,
+                action: "profile_updated",
+                previous,
+                next: validatedUpdates,
+              },
+            ],
+            { session }
+          );
+        });
+      } finally {
+        await session.endSession();
+      }
+    } else {
+      await profile.save();
+      await ActivityLog.create({
+        actor: req.user.userId,
+        actorName: actor?.name || "Lawyer",
+        actorRole: "lawyer",
+        lawyer: profile._id,
+        action: "profile_updated",
+        previous,
+        next: validatedUpdates,
+      });
+    }
 
     const locationId = await getLocationIdForCity(profile.officeCity);
 
+    let message = "Lawyer profile updated successfully.";
+
+    if (requeuedFromProfileEdit) {
+      message = "Lawyer profile updated and returned to the admin review queue.";
+    } else if (requiresDocumentResubmission) {
+      message =
+        "Lawyer profile updated. Your verification documents still require changes, so please resubmit them from the verification page.";
+    }
+
     return res.json({
-      message: wasRejected
-        ? "Lawyer profile updated and resubmitted for review."
-        : "Lawyer profile updated successfully.",
+      message,
       reviewRequired: true,
+      verificationActionRequired: requiresDocumentResubmission,
       profile: {
         ...profile.toObject(),
         locationId,

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 
-import { useAuth } from "../context/AuthContext.jsx";
-import { useSavedLawyers } from "../context/SavedLawyersContext.jsx";
+import { useAuth } from "../context/useAuth.js";
+import { useSavedLawyers } from "../context/useSavedLawyers.js";
 import LawyerDashboardPage from "./lawyer/LawyerDashboardPage.jsx";
 
 function getInitials(name = "") {
@@ -45,14 +45,10 @@ function AccountProfile({ user }) {
   const { updateAccount } = useAuth();
   const { savedCount } = useSavedLawyers();
   const [editing, setEditing] = useState(false);
-  const [name, setName] = useState(user.name || "");
+  const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-
-  useEffect(() => {
-    setName(user.name || "");
-  }, [user.name]);
 
   async function handleSave(event) {
     event.preventDefault();
@@ -140,6 +136,7 @@ function AccountProfile({ user }) {
                   <button
                     type="button"
                     onClick={() => {
+                      setName(user.name || "");
                       setEditing(true);
                       setError("");
                       setNotice("");
@@ -175,7 +172,7 @@ function AccountProfile({ user }) {
                     <button
                       type="button"
                       onClick={() => {
-                        setName(user.name || "");
+                        setName("");
                         setEditing(false);
                         setError("");
                       }}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAuth } from "../../context/AuthContext.jsx";
+import { useAuth } from "../../context/useAuth.js";
 import { apiRequest, API_URL } from "../../services/api.js";
 
 const labels = { pending: "Pending", approved: "Approved", rejected: "Changes requested" };
@@ -29,6 +29,7 @@ export default function AdminDashboardPage() {
   const [preview, setPreview] = useState(null);
   const [decision, setDecision] = useState("pending");
   const [reason, setReason] = useState("");
+  const [rejectionScope, setRejectionScope] = useState("both");
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [newAdmin, setNewAdmin] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
@@ -38,7 +39,9 @@ export default function AdminDashboardPage() {
   const [detailsLoading, setDetailsLoading] = useState(false);
   const refresh = useCallback(async () => {
     const [people, customers, staff, logs] = await Promise.all([apiRequest("/admin/lawyers", { token }), apiRequest("/admin/clients", { token }), apiRequest("/admin/admins", { token }), apiRequest("/admin/activity", { token })]);
-    setLawyers(people.lawyers || []); setClients(customers.clients || []); setAdmins(staff.admins || []); setActivity(logs.entries || []);
+    const nextLawyers = people.lawyers || [];
+    setLawyers(nextLawyers); setClients(customers.clients || []); setAdmins(staff.admins || []); setActivity(logs.entries || []);
+    return nextLawyers;
   }, [token]);
   useEffect(() => { const timer = setTimeout(() => { refresh().catch((err) => setError(err.message)).finally(() => setLoading(false)); }, 0); return () => clearTimeout(timer); }, [refresh]);
   const counts = { all: lawyers.length, pending: lawyers.filter((row) => row.reviewStatus === "pending").length, resubmitted: lawyers.filter((row) => row.resubmitted && row.reviewStatus === "pending").length, approved: lawyers.filter((row) => row.reviewStatus === "approved").length, rejected: lawyers.filter((row) => row.reviewStatus === "rejected").length };
@@ -48,10 +51,10 @@ export default function AdminDashboardPage() {
   function closePreview() { if (preview?.url) URL.revokeObjectURL(preview.url); setPreview(null); }
   async function toggleProfile(row) {
     if (selected?._id === row._id) { closePreview(); setSelected(null); return; }
-    closePreview(); setSelected(row); setVerification(null); setHistory([]); setShowHistory(false); setDetailsLoading(true); setError(""); setDecision(row.reviewStatus); setReason(row.rejectionReason || "");
+    closePreview(); setSelected(row); setVerification(null); setHistory([]); setShowHistory(false); setDetailsLoading(true); setError(""); setDecision(row.reviewStatus); setReason(row.rejectionReason || ""); setRejectionScope("both");
     try {
       const [docs, log] = await Promise.all([apiRequest(`/admin/lawyers/${row._id}/verification`, { token }), apiRequest(`/admin/lawyers/${row._id}/activity`, { token })]);
-      setVerification(docs.verification); setHistory(log.entries || []); setReason(docs.verification?.reason || row.rejectionReason || "");
+      setVerification(docs.verification); setHistory(log.entries || []); setReason(docs.verification?.reason || row.rejectionReason || ""); setRejectionScope(docs.verification?.rejectionScope || "both");
     } catch (err) { setError(err.message); } finally { setDetailsLoading(false); }
   }
   async function openDocument(submission, file) {
@@ -65,10 +68,10 @@ export default function AdminDashboardPage() {
   async function saveDecision(event) {
     event.preventDefault(); setBusy(true); setError(""); setNotice("");
     try {
-      const result = await apiRequest(`/admin/lawyers/${selected._id}/decision`, { method: "PATCH", token, body: { decision, reason } });
-      await refresh();
+      const result = await apiRequest(`/admin/lawyers/${selected._id}/decision`, { method: "PATCH", token, body: { decision, reason, rejectionScope } });
+      const refreshedLawyers = await refresh();
       const [docs, log] = await Promise.all([apiRequest(`/admin/lawyers/${selected._id}/verification`, { token }), apiRequest(`/admin/lawyers/${selected._id}/activity`, { token })]);
-      setVerification(docs.verification); setHistory(log.entries || []); setSelected((row) => ({ ...row, reviewStatus: decision, isPublished: decision === "approved", rejectionReason: decision === "rejected" ? reason : null })); setNotice(result.message || "Decision saved.");
+      setVerification(docs.verification); setHistory(log.entries || []); setRejectionScope(docs.verification?.rejectionScope || "both"); setSelected(refreshedLawyers.find((row) => row._id === selected._id) || result.lawyer || selected); setNotice(result.message || "Decision saved.");
     } catch (err) { setError(err.message); } finally { setBusy(false); }
   }
   async function addAdmin(event) {
@@ -88,7 +91,7 @@ export default function AdminDashboardPage() {
         {row.pendingProfileChanges && <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm"><h3 className="font-bold">Professional profile update awaiting review</h3><p className="mt-1">The already approved public profile stays live while these requested changes are reviewed.</p><dl className="mt-3 grid gap-2 sm:grid-cols-2">{Object.entries(row.pendingProfileChanges).map(([key, value]) => <div key={key}><dt className="font-semibold">{key.replaceAll(/([A-Z])/g, " $1")}</dt><dd>{Array.isArray(value) ? value.join(", ") : String(value)}</dd></div>)}</dl></div>}
         <h3 className="mt-7 text-lg font-bold">Verification documents</h3>{!verification?.submissions?.length && <p className="mt-2 rounded-lg bg-amber-50 p-3 text-sm">No documents submitted. New lawyers need a submission before approval.</p>}{verification?.submissions.slice().reverse().map((submission) => <div key={submission._id} className="mt-3 rounded-lg border border-brand-border p-4"><p className="font-semibold">Submission {submission.number} <span className="font-normal text-brand-muted">· {date(submission.submittedAt)}</span></p><p className="mt-1 text-sm">Enrolment: {submission.enrolmentNumber} · {submission.identityType?.toUpperCase()}</p><div className="mt-3 flex flex-wrap gap-2">{submission.files.map((file) => <button type="button" key={file._id} onClick={() => openDocument(submission, file)} className={button}>View {fileNames[file.slot] || file.slot}</button>)}</div></div>)}
         {preview && <div className="mt-4 rounded-xl border border-brand-border bg-brand-background p-4"><div className="mb-3 flex justify-between gap-2"><h4 className="font-bold">Preview: {preview.name}</h4><button type="button" className={button} onClick={closePreview}>Close</button></div>{preview.type === "application/pdf" ? <iframe title={preview.name} src={preview.url} className="h-[65vh] w-full rounded-lg border bg-white" /> : <img src={preview.url} alt={preview.name} className="max-h-[65vh] max-w-full rounded-lg border bg-white object-contain" />}</div>}
-        <form onSubmit={saveDecision} className="mt-7 rounded-xl border border-brand-border bg-brand-background p-5"><h3 className="text-lg font-bold">Review decision</h3><p className="mt-1 text-sm text-brand-muted">You can correct a decision later. Changes are recorded in profile history.</p><div className="mt-4 grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold">Decision<select value={decision} onChange={(event) => setDecision(event.target.value)} className="mt-2 block w-full rounded-lg border p-3"><option value="pending">Keep pending</option><option value="approved">Approve and publish</option><option value="rejected">Request changes</option></select></label><label className="text-sm font-semibold">Reason<textarea rows={3} maxLength={2000} required={decision === "rejected"} value={reason} onChange={(event) => setReason(event.target.value)} className="mt-2 block w-full rounded-lg border p-3" placeholder="Explain what needs correction" /></label></div>{decision === "approved" && !canApprove && <p className="mt-2 text-sm text-amber-900">Documents must be submitted first.</p>}<button disabled={busy || (decision === "approved" && !canApprove)} className="mt-4 rounded-lg bg-brand-black px-5 py-3 text-sm font-bold text-white disabled:opacity-50">{busy ? "Saving..." : "Save decision"}</button></form>
+        <form onSubmit={saveDecision} className="mt-7 rounded-xl border border-brand-border bg-brand-background p-5"><h3 className="text-lg font-bold">Review decision</h3><p className="mt-1 text-sm text-brand-muted">You can correct a decision later. Changes are recorded in profile history.</p><div className="mt-4 grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold">Decision<select value={decision} onChange={(event) => setDecision(event.target.value)} className="mt-2 block w-full rounded-lg border p-3"><option value="pending">Keep pending</option><option value="approved">Approve and publish</option><option value="rejected">Request changes</option></select></label><label className="text-sm font-semibold">Reason<textarea rows={3} maxLength={2000} required={decision === "rejected"} value={reason} onChange={(event) => setReason(event.target.value)} className="mt-2 block w-full rounded-lg border p-3" placeholder="Explain what needs correction" /></label></div>{decision === "rejected" && !selected?.isPublished && <label className="mt-4 block text-sm font-semibold">What needs correction?<select value={rejectionScope} onChange={(event) => setRejectionScope(event.target.value)} className="mt-2 block w-full max-w-md rounded-lg border p-3"><option value="profile">Profile details only</option><option value="documents">Verification documents only</option><option value="both">Profile details and verification documents</option></select><span className="mt-1 block font-normal text-brand-muted">This controls whether the lawyer must upload new documents or only edit the profile before returning to review.</span></label>}{decision === "approved" && !canApprove && <p className="mt-2 text-sm text-amber-900">Documents must be submitted first.</p>}<button disabled={busy || (decision === "approved" && !canApprove)} className="mt-4 rounded-lg bg-brand-black px-5 py-3 text-sm font-bold text-white disabled:opacity-50">{busy ? "Saving..." : "Save decision"}</button></form>
         <div className="mt-7"><button className={button} type="button" aria-expanded={showHistory} onClick={() => setShowHistory((open) => !open)}>Profile history ({history.length}) {showHistory ? "↑" : "↓"}</button>{showHistory && <div className="mt-4"><Table headers={["Date", "User", "Action", "Change", "Reason"]} empty="No history yet." rows={history.map((entry) => <tr key={entry._id}><td className={td}>{date(entry.createdAt)}</td><td className={td}>{entry.actorName} ({entry.actorRole})</td><td className={td}>{actionNames[entry.action] || entry.action}</td><td className={td}>{entry.previous?.status || "New"} → {entry.next?.status || "Updated"}</td><td className={td}>{entry.reason || "—"}</td></tr>)} /></div>}</div>
       </>}</div>}</article>)}</div></section>}
     {tab === "activity" && <section className="mt-6"><h2 className="mb-4 text-xl font-bold">Admin activity</h2><Table headers={["Date", "Admin", "Action", "Lawyer", "Change", "Reason"]} empty="No admin actions recorded." rows={activity.map((entry) => <tr key={entry._id}><td className={td}>{date(entry.createdAt)}</td><td className={td}>{entry.actorName}</td><td className={td}>{actionNames[entry.action] || entry.action}</td><td className={td}>{entry.lawyer ? names[String(entry.lawyer)] || "Lawyer profile" : "—"}</td><td className={td}>{entry.previous?.status || "New"} → {entry.next?.status || entry.next?.name || "Updated"}</td><td className={td}>{entry.reason || "—"}</td></tr>)} /></section>}

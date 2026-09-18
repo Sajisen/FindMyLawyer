@@ -1,14 +1,13 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 
-import { useAuth } from "./AuthContext.jsx";
+import SavedLawyersContext from "./savedLawyersContext.js";
+import { useAuth } from "./useAuth.js";
 import { getLawyersByIds } from "../features/lawyers/lawyerApi.js";
 import {
   getSavedLawyers,
@@ -16,8 +15,6 @@ import {
   saveLawyerToAccount,
   syncGuestSavedLawyers,
 } from "../features/savedLawyers/savedLawyerApi.js";
-
-const SavedLawyersContext = createContext(null);
 
 const STORAGE_KEY = "findmylawyer.guestSavedLawyers.v1";
 const MAX_GUEST_SAVED = 100;
@@ -430,14 +427,3 @@ export function SavedLawyersProvider({ children }) {
   );
 }
 
-export function useSavedLawyers() {
-  const context = useContext(SavedLawyersContext);
-
-  if (!context) {
-    throw new Error(
-      "useSavedLawyers must be used inside SavedLawyersProvider"
-    );
-  }
-
-  return context;
-}

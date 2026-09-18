@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 import logoIcon from "../../assets/findmylawyer-icon.png";
-import { useSavedLawyers } from "../../context/SavedLawyersContext.jsx";
+import { useSavedLawyers } from "../../context/useSavedLawyers.js";
 
 export default function Footer() {
   const { canSave } = useSavedLawyers();

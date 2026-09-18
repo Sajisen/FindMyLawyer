@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 
-import { useAuth } from "../../context/AuthContext.jsx";
-import { useSavedLawyers } from "../../context/SavedLawyersContext.jsx";
+import { useAuth } from "../../context/useAuth.js";
+import { useSavedLawyers } from "../../context/useSavedLawyers.js";
 import logoIcon from "../../assets/findmylawyer-icon.png";
 
 function getInitials(name = "") {

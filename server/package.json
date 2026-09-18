@@ -9,7 +9,8 @@
     "create-admin": "node src/scripts/createAdmin.js",
     "seed": "node src/seed/seedLawyers.js",
     "seed:meta": "node src/scripts/seedSearchMetadata.js",
-    "import:locations": "node src/scripts/importSriLankaLocations.js"
+    "import:locations": "node src/scripts/importSriLankaLocations.js",
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",

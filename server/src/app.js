@@ -20,8 +20,20 @@ app.use(
   })
 );
 
-app.use("/api/lawyers/me/verification", express.json({ limit: "13mb" }));
-app.use(express.json({ limit: "25kb" }));
+const standardJsonParser = express.json({ limit: "25kb" });
+
+app.use((req, res, next) => {
+  const normalizedPath = req.path.replace(/\/+$/, "") || "/";
+  const isVerificationUpload =
+    req.method === "POST" &&
+    normalizedPath === "/api/lawyers/me/verification";
+
+  if (isVerificationUpload) {
+    return next();
+  }
+
+  return standardJsonParser(req, res, next);
+});
 
 app.get("/api/health", (req, res) => {
   res.json({
@@ -58,5 +70,19 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/meta", metaRoutes);
 app.use("/api/saved-lawyers", savedLawyerRoutes);
 app.use("/api/ai", aiHourlyLimiter, aiBurstLimiter, aiRoutes);
+
+app.use((error, req, res, next) => {
+  if (error?.type === "entity.too.large") {
+    return res.status(413).json({
+      message: "The request is too large. Reduce the uploaded file sizes and try again.",
+    });
+  }
+
+  if (error instanceof SyntaxError && error.status === 400 && "body" in error) {
+    return res.status(400).json({ message: "Invalid JSON request body." });
+  }
+
+  return next(error);
+});
 
 export default app;

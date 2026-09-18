@@ -11,6 +11,7 @@ import {
 import { getMine, submit, viewFile } from "../controllers/verificationController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { allowRoles } from "../middleware/roleMiddleware.js";
+import { verificationUploadLimiter } from "../middleware/rateLimiters.js";
 
 const router = express.Router();
 
@@ -35,7 +36,14 @@ router.patch(
 );
 
 router.get("/me/verification", protect, allowRoles("lawyer"), getMine);
-router.post("/me/verification", protect, allowRoles("lawyer"), submit);
+router.post(
+  "/me/verification",
+  protect,
+  allowRoles("lawyer"),
+  verificationUploadLimiter,
+  express.json({ limit: "13mb" }),
+  submit
+);
 router.get("/:lawyerId/verification/submissions/:submissionId/files/:fileId", protect, allowRoles("lawyer"), viewFile);
 
 // PUBLIC INDIVIDUAL LAWYER

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import ChevronDownIcon from "../../../components/ui/ChevronDownIcon.jsx";
 import SelectControl from "../../../components/ui/SelectControl.jsx";
@@ -39,17 +39,15 @@ export default function ManualSearchPanel({
   );
   const canSearch = hasMainFilter && !hasUnselectedLocation;
 
-  useEffect(() => {
-    if (!hasMainFilter) {
-      setShowMoreFilters(false);
-    }
-  }, [hasMainFilter]);
-
   function markChanged() {
     onFiltersChanged?.();
   }
 
   function updateFilter(field, value) {
+    if (field === "category" && !value && !filters.locationId) {
+      setShowMoreFilters(false);
+    }
+
     markChanged();
     setFilters((previous) => ({
       ...previous,
@@ -58,6 +56,10 @@ export default function ManualSearchPanel({
   }
 
   function handleLocationChange(value) {
+    if (!filters.category) {
+      setShowMoreFilters(false);
+    }
+
     markChanged();
     setFilters((previous) => ({
       ...previous,
@@ -90,6 +92,8 @@ export default function ManualSearchPanel({
   }
 
   function clearFilters() {
+    setShowMoreFilters(false);
+
     if (onClear) {
       onClear();
       return;
@@ -98,6 +102,8 @@ export default function ManualSearchPanel({
     markChanged();
     setFilters(EMPTY_FILTERS);
   }
+
+  const advancedFiltersOpen = hasMainFilter && showMoreFilters;
 
   const extraFilterCount = [
     filters.language,
@@ -170,7 +176,7 @@ export default function ManualSearchPanel({
         type="button"
         disabled={!hasMainFilter}
         onClick={() => setShowMoreFilters((previous) => !previous)}
-        aria-expanded={showMoreFilters}
+        aria-expanded={advancedFiltersOpen}
         className="mt-5 flex w-full items-center justify-between border-y border-brand-border py-4 text-sm font-semibold text-brand-black transition hover:text-brand-black disabled:cursor-not-allowed disabled:text-neutral-400"
       >
         <span className="flex items-center gap-2">
@@ -184,12 +190,12 @@ export default function ManualSearchPanel({
 
         <ChevronDownIcon
           className={`h-4 w-4 text-brand-muted transition-transform ${
-            showMoreFilters ? "rotate-180" : ""
+            advancedFiltersOpen ? "rotate-180" : ""
           }`}
         />
       </button>
 
-      {showMoreFilters && (
+      {advancedFiltersOpen && (
         <div className="mt-5 space-y-5">
           <div>
             <label
