@@ -11,6 +11,7 @@ export const PUBLIC_LAWYER_VISIBILITY = {
     {
       isDemo: { $ne: true },
       isPublished: true,
+      accountActive: { $ne: false },
     },
   ],
 };

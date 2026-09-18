@@ -98,9 +98,17 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-semibold text-brand-black">
-                Password
-              </label>
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <label className="block text-sm font-semibold text-brand-black">
+                  Password
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-bold text-brand-muted hover:text-brand-black hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
 
               <input
                 type="password"
@@ -108,6 +116,7 @@ export default function LoginPage() {
                 value={form.password}
                 onChange={handleChange}
                 required
+                autoComplete="current-password"
                 className="w-full rounded-xl border border-brand-border px-4 py-3 outline-none focus:border-brand-black"
               />
             </div>

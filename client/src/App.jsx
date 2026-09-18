@@ -9,6 +9,8 @@ import FindLawyersPage from "./pages/FindLawyersPage.jsx";
 import LawyerProfilePage from "./pages/LawyerProfilePage.jsx";
 import SavedLawyersPage from "./pages/SavedLawyersPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
+import AccountSecurityPage from "./pages/AccountSecurityPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import RegisterLawyerPage from "./pages/RegisterLawyerPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
@@ -28,8 +30,18 @@ function App() {
         <Route path="/lawyers/:id" element={<LawyerProfilePage />} />
         <Route path="/saved-lawyers" element={<SavedLawyersPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/register-lawyer" element={<RegisterLawyerPage />} />
+
+        <Route
+          path="/account-security"
+          element={
+            <ProtectedRoute roles={["client", "lawyer", "admin"]}>
+              <AccountSecurityPage />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/profile"

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
 import ActivityLog from "../models/ActivityLog.js";
+import AccountOtp from "../models/AccountOtp.js";
 import LawyerProfile from "../models/LawyerProfile.js";
 import User from "../models/User.js";
 import Verification from "../models/Verification.js";
@@ -83,7 +84,7 @@ async function recordAction(
 export const getAllLawyers = async (req, res) => {
   try {
     const lawyers = await LawyerProfile.find(realLawyers)
-      .populate("userId", "name email role")
+      .populate("userId", "name email role isActive")
       .sort({ updatedAt: -1 });
     const records = await Verification.find({
       lawyer: { $in: lawyers.map((lawyer) => lawyer._id) },
@@ -106,7 +107,7 @@ export const getAllLawyers = async (req, res) => {
 export const getPendingLawyers = async (req, res) => {
   try {
     const lawyers = await LawyerProfile.find(realLawyers)
-      .populate("userId", "name email role")
+      .populate("userId", "name email role isActive")
       .sort({ updatedAt: -1 });
     const records = await Verification.find({
       lawyer: { $in: lawyers.map((lawyer) => lawyer._id) },
@@ -408,7 +409,7 @@ export const createAdmin = async (req, res) => {
 export const getRegisteredClients = async (req, res) => {
   try {
     const clients = await User.find({ role: "client" })
-      .select("_id name email createdAt updatedAt")
+      .select("_id name email isActive createdAt updatedAt")
       .sort({ createdAt: -1 })
       .lean();
     return res.json({ count: clients.length, clients });
@@ -421,12 +422,142 @@ export const getRegisteredClients = async (req, res) => {
 export const getRegisteredAdmins = async (req, res) => {
   try {
     const admins = await User.find({ role: "admin" })
-      .select("_id name email createdAt")
+      .select("_id name email isActive createdAt")
       .sort({ createdAt: -1 })
       .lean();
     return res.json({ count: admins.length, admins });
   } catch (error) {
     console.error("List admins error:", error);
     return res.status(500).json({ message: "Failed to list admins." });
+  }
+};
+
+
+export const updateUserStatus = async (req, res) => {
+  const { id } = req.params;
+  const { isActive } = req.body || {};
+
+  if (!mongoose.isValidObjectId(id) || typeof isActive !== "boolean") {
+    return res.status(400).json({ message: "Provide a valid user and account status." });
+  }
+
+  if (String(id) === String(req.user.userId) && isActive === false) {
+    return res.status(409).json({
+      message: "You cannot disable the administrator account you are currently using.",
+    });
+  }
+
+  let session;
+
+  try {
+    session = await mongoose.startSession();
+    let result;
+
+    await session.withTransaction(async () => {
+      const target = await User.findById(id).session(session);
+
+      if (!target) {
+        const error = new Error("USER_NOT_FOUND");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      const currentActive = target.isActive !== false;
+      if (currentActive === isActive) {
+        result = {
+          message: isActive ? "Account is already active." : "Account is already disabled.",
+          user: {
+            id: target._id,
+            name: target.name,
+            email: target.email,
+            role: target.role,
+            isActive: currentActive,
+          },
+        };
+        return;
+      }
+
+      if (target.role === "admin" && isActive === false) {
+        const activeAdminCount = await User.countDocuments({
+          role: "admin",
+          isActive: { $ne: false },
+        }).session(session);
+
+        if (activeAdminCount <= 1) {
+          const error = new Error("LAST_ACTIVE_ADMIN");
+          error.statusCode = 409;
+          throw error;
+        }
+      }
+
+      let lawyerProfile = null;
+      if (target.role === "lawyer") {
+        lawyerProfile = await LawyerProfile.findOne({
+          userId: target._id,
+          ...realLawyers,
+        }).session(session);
+
+        if (lawyerProfile) {
+          lawyerProfile.accountActive = isActive;
+          await lawyerProfile.save({ session });
+        }
+      }
+
+      target.isActive = isActive;
+      target.authVersion = Number(target.authVersion || 0) + 1;
+      await target.save({ session });
+
+      await AccountOtp.deleteMany({ userId: target._id }).session(session);
+
+      await recordAction(
+        req,
+        lawyerProfile?._id || null,
+        "user_status_updated",
+        {
+          userId: target._id,
+          name: target.name,
+          email: target.email,
+          role: target.role,
+          isActive: currentActive,
+        },
+        {
+          userId: target._id,
+          name: target.name,
+          email: target.email,
+          role: target.role,
+          isActive,
+        },
+        "",
+        session
+      );
+
+      result = {
+        message: isActive ? "Account re-enabled." : "Account disabled.",
+        user: {
+          id: target._id,
+          name: target.name,
+          email: target.email,
+          role: target.role,
+          isActive,
+        },
+      };
+    });
+
+    return res.json(result);
+  } catch (error) {
+    if (error.message === "USER_NOT_FOUND") {
+      return res.status(404).json({ message: "User account not found." });
+    }
+
+    if (error.message === "LAST_ACTIVE_ADMIN") {
+      return res.status(409).json({
+        message: "The last active administrator cannot be disabled.",
+      });
+    }
+
+    console.error("Update user status error:", error);
+    return res.status(500).json({ message: "Failed to update account status." });
+  } finally {
+    if (session) await session.endSession();
   }
 };

@@ -176,3 +176,13 @@ Expected:
 ```text
 401 Authentication required
 ```
+
+### Temporary profile availability must not destroy guest saves
+
+1. As a guest, save a real published lawyer.
+2. As an admin, temporarily disable that lawyer account.
+3. Refresh the guest browser.
+4. The disabled lawyer should not be displayed as a public saved profile, but its raw device save must remain in localStorage.
+5. Re-enable the lawyer and refresh the guest browser.
+6. The lawyer should appear in Saved Lawyers again.
+7. If the guest logs into a client while the lawyer is disabled and chooses Merge, only server-confirmed synchronized IDs should be removed from guest storage; the unavailable ID must remain on the device for a later retry.

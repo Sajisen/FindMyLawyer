@@ -168,6 +168,7 @@ export async function mergeGuestSavedLawyers(userId, lawyerIds = []) {
   return {
     ...collection,
     synchronizedCount: validIds.length,
+    synchronizedIds: validIds,
     ignoredCount: lawyerIds.length - validIds.length,
   };
 }

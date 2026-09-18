@@ -21,6 +21,17 @@ async function startServer() {
 
       const aiStatus = getAIProviderStatus();
 
+      const otpDelivery = String(
+        process.env.ACCOUNT_OTP_DELIVERY ||
+          (process.env.NODE_ENV === "production" ? "disabled" : "console")
+      ).toLowerCase();
+
+      if (otpDelivery === "console") {
+        console.warn(
+          "Account OTP delivery: console (development only — OTPs will be printed in this terminal)"
+        );
+      }
+
       if (aiStatus.activeProvider) {
         console.log(
           `Advanced Search AI provider: ${aiStatus.activeProvider} (${aiStatus.model})`

@@ -23,6 +23,7 @@ const actionNames = {
   location_archived: "Location archived",
   location_restored: "Location restored",
   location_deleted: "Location deleted",
+  user_status_updated: "Account status updated",
 };
 
 const fileNames = {
@@ -69,6 +70,9 @@ function describeActivityChange(entry) {
     return `${entry.previous?.city || "Location"} → ${entry.next?.city || "Updated"}`;
   }
   if (entry.action === "admin_created") return "Administrator created";
+  if (entry.action === "user_status_updated") {
+    return `${entry.previous?.isActive === false ? "Disabled" : "Active"} → ${entry.next?.isActive === false ? "Disabled" : "Active"}`;
+  }
 
   return "Updated";
 }
@@ -442,6 +446,42 @@ export default function AdminDashboardPage() {
     }
   }
 
+  async function toggleUserStatus(target, nextActive) {
+    const targetId = target?._id || target?.id;
+    const label = target?.displayName || target?.name || target?.email || "this account";
+
+    if (!targetId) {
+      setError("This account is missing its user identifier.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      nextActive
+        ? `Re-enable ${label}? They will need to sign in again.`
+        : `Disable ${label}? Existing sessions will stop working and the account will not be able to sign in.`
+    );
+
+    if (!confirmed) return;
+
+    setBusy(true);
+    setError("");
+    setNotice("");
+
+    try {
+      const result = await apiRequest(`/admin/users/${targetId}/status`, {
+        method: "PATCH",
+        token,
+        body: { isActive: nextActive },
+      });
+      await refreshCoreData();
+      setNotice(result.message || "Account status updated.");
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function openAddLocation() {
     setEditingLocationId("");
     setLocationForm(emptyLocationForm);
@@ -705,6 +745,8 @@ export default function AdminDashboardPage() {
             setNewAdmin={setNewAdmin}
             addAdmin={addAdmin}
             busy={busy}
+            currentUserId={user?.id}
+            onToggleUserStatus={toggleUserStatus}
           />
         )}
 
@@ -759,8 +801,12 @@ export default function AdminDashboardPage() {
                   <td className={td}>{actionNames[entry.action] || entry.action}</td>
                   <td className={td}>
                     {entry.lawyer
-                      ? lawyerNames[String(entry.lawyer)] || "Lawyer profile"
-                      : entry.next?.city || entry.previous?.city || "System"}
+                      ? lawyerNames[String(entry.lawyer)] || entry.next?.name || entry.previous?.name || "Lawyer profile"
+                      : entry.next?.city ||
+                        entry.previous?.city ||
+                        entry.next?.name ||
+                        entry.previous?.name ||
+                        "System"}
                   </td>
                   <td className={td}>{describeActivityChange(entry)}</td>
                   <td className={td}>{entry.reason || "—"}</td>
@@ -1109,6 +1155,8 @@ function UsersSection({
   setNewAdmin,
   addAdmin,
   busy,
+  currentUserId,
+  onToggleUserStatus,
 }) {
   return (
     <section className="mt-6">
@@ -1135,35 +1183,72 @@ function UsersSection({
 
       {userTab === "clients" && (
         <Table
-          headers={["Name", "Email", "Registered"]}
+          headers={["Name", "Email", "Account", "Registered", "Action"]}
           empty="No clients registered."
-          rows={clients.map((row) => (
-            <tr key={row._id}>
-              <td className={td}>{row.name}</td>
-              <td className={td}>{row.email}</td>
-              <td className={td}>{formatDate(row.createdAt)}</td>
-            </tr>
-          ))}
+          rows={clients.map((row) => {
+            const active = row.isActive !== false;
+            return (
+              <tr key={row._id}>
+                <td className={td}>{row.name}</td>
+                <td className={td}>{row.email}</td>
+                <td className={td}><AccountStatus active={active} /></td>
+                <td className={td}>{formatDate(row.createdAt)}</td>
+                <td className={td}>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => onToggleUserStatus(row, !active)}
+                    className={secondaryButton}
+                  >
+                    {active ? "Disable" : "Re-enable"}
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         />
       )}
 
       {userTab === "lawyers" && (
         <Table
-          headers={["Name", "Email", "Status", "Registered"]}
+          headers={["Name", "Email", "Review", "Account", "Registered", "Action"]}
           empty="No lawyers registered."
-          rows={lawyers.map((row) => (
-            <tr key={row._id}>
-              <td className={td}>
-                <div className="flex items-center gap-3">
-                  <LawyerAvatar lawyer={row} className="h-10 w-10 rounded-xl text-xs" />
-                  <span>{row.displayName}</span>
-                </div>
-              </td>
-              <td className={td}>{row.userId?.email || row.email}</td>
-              <td className={td}><Status value={row.reviewStatus} /></td>
-              <td className={td}>{formatDate(row.createdAt)}</td>
-            </tr>
-          ))}
+          rows={lawyers.map((row) => {
+            const active = row.userId?.isActive !== false;
+            return (
+              <tr key={row._id}>
+                <td className={td}>
+                  <div className="flex items-center gap-3">
+                    <LawyerAvatar lawyer={row} className="h-10 w-10 rounded-xl text-xs" />
+                    <span>{row.displayName}</span>
+                  </div>
+                </td>
+                <td className={td}>{row.userId?.email || row.email}</td>
+                <td className={td}><Status value={row.reviewStatus} /></td>
+                <td className={td}><AccountStatus active={active} /></td>
+                <td className={td}>{formatDate(row.createdAt)}</td>
+                <td className={td}>
+                  {row.userId?._id ? (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() =>
+                        onToggleUserStatus(
+                          { ...row.userId, displayName: row.displayName },
+                          !active
+                        )
+                      }
+                      className={secondaryButton}
+                    >
+                      {active ? "Disable" : "Re-enable"}
+                    </button>
+                  ) : (
+                    <span className="text-xs text-brand-muted">Demo profile</span>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
         />
       )}
 
@@ -1209,19 +1294,50 @@ function UsersSection({
             </form>
           )}
           <Table
-            headers={["Name", "Email", "Created"]}
+            headers={["Name", "Email", "Account", "Created", "Action"]}
             empty="No admins found."
-            rows={admins.map((row) => (
-              <tr key={row._id}>
-                <td className={td}>{row.name}</td>
-                <td className={td}>{row.email}</td>
-                <td className={td}>{formatDate(row.createdAt)}</td>
-              </tr>
-            ))}
+            rows={admins.map((row) => {
+              const active = row.isActive !== false;
+              const isCurrent = String(row._id) === String(currentUserId);
+              return (
+                <tr key={row._id}>
+                  <td className={td}>{row.name}</td>
+                  <td className={td}>{row.email}</td>
+                  <td className={td}><AccountStatus active={active} /></td>
+                  <td className={td}>{formatDate(row.createdAt)}</td>
+                  <td className={td}>
+                    {isCurrent ? (
+                      <span className="text-xs font-semibold text-brand-muted">Current account</span>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => onToggleUserStatus(row, !active)}
+                        className={secondaryButton}
+                      >
+                        {active ? "Disable" : "Re-enable"}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           />
         </>
       )}
     </section>
+  );
+}
+
+function AccountStatus({ active }) {
+  return (
+    <span
+      className={`rounded-full px-3 py-1 text-xs font-bold ${
+        active ? "bg-green-50 text-green-800" : "bg-slate-100 text-slate-700"
+      }`}
+    >
+      {active ? "Active" : "Disabled"}
+    </span>
   );
 }
 

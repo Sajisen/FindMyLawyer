@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-
 import User from "../models/User.js";
+import { createAuthToken } from "../services/authTokenService.js";
 import LawyerProfile from "../models/LawyerProfile.js";
 import { normalizeSriLankanPhone, isPhoneInUse, isPhoneDuplicateError } from "../services/lawyerPhone.js";
 import {
@@ -14,16 +13,6 @@ import {
 } from "../services/lawyerProfileValidationService.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const createToken = (user) =>
-  jwt.sign(
-    {
-      userId: user._id,
-      role: user.role,
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
 
 function normalizeEmail(email = "") {
   return String(email).trim().toLowerCase();
@@ -87,7 +76,7 @@ export const registerClient = async (req, res) => {
       passwordHash,
       role: "client",
     });
-    const token = createToken(user);
+    const token = createAuthToken(user);
 
     return res.status(201).json({
       message: "Client account created successfully.",
@@ -238,7 +227,7 @@ export const registerLawyer = async (req, res) => {
       verifiedBy: null,
     });
 
-    const token = createToken(createdUser);
+    const token = createAuthToken(createdUser);
 
     return res.status(201).json({
       message:
@@ -315,7 +304,13 @@ export const login = async (req, res) => {
       });
     }
 
-    const token = createToken(user);
+    if (user.isActive === false) {
+      return res.status(403).json({
+        message: "This account has been disabled. Contact an administrator if you believe this is a mistake.",
+      });
+    }
+
+    const token = createAuthToken(user);
 
     return res.json({
       message: "Login successful.",

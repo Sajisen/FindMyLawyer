@@ -119,6 +119,16 @@ const lawyerProfileSchema = new mongoose.Schema(
       default: false,
     },
 
+    // Mirrors whether the linked real user account is enabled. Publication and
+    // verification remain separate so disabling/re-enabling an account never
+    // destroys the lawyer's approved-profile state. Missing legacy values are
+    // treated as active by public visibility queries.
+    accountActive: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
+
     isDemo: {
       type: Boolean,
       default: false,

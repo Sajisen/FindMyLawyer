@@ -6,7 +6,7 @@ import {
   rejectLawyer,
   createAdmin,
   getRegisteredClients, getRegisteredAdmins,
-  decideLawyer, getAllLawyers, getLawyerActivity, getAdminActivity,
+  decideLawyer, getAllLawyers, getLawyerActivity, getAdminActivity, updateUserStatus,
 } from "../controllers/adminController.js";
 
 import { getLawyerVerification, viewFile } from "../controllers/verificationController.js";
@@ -51,6 +51,7 @@ router.post("/admins", createAdmin);
 router.get("/admins", getRegisteredAdmins);
 
 router.get("/clients", getRegisteredClients);
+router.patch("/users/:id/status", updateUserStatus);
 
 
 export default router;

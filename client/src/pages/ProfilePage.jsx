@@ -129,7 +129,7 @@ function AccountProfile({ user }) {
                 <div>
                   <h3 className="font-bold text-brand-black">Account details</h3>
                   <p className="mt-1 text-sm text-brand-muted">
-                    Your email is used to sign in and is not editable here.
+                    Update your display name here. Sign-in email and password are managed separately.
                   </p>
                 </div>
                 {!editing && (
@@ -183,12 +183,20 @@ function AccountProfile({ user }) {
                   </div>
                 </form>
               ) : (
-                <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                <>
+                  <div className="mt-6 grid gap-5 sm:grid-cols-2">
                   <ProfileItem label="Name" value={user.name} />
                   <ProfileItem label="Email" value={user.email} />
                   <ProfileItem label="Account type" value={user.role === "admin" ? "Administrator" : "Client"} />
                   <ProfileItem label="Member since" value={formatDate(user.createdAt)} />
-                </div>
+                  </div>
+                  <Link
+                    to="/account-security"
+                    className="mt-6 inline-flex rounded-xl border border-brand-border bg-white px-4 py-2.5 text-sm font-bold text-brand-black transition hover:bg-brand-background"
+                  >
+                    Manage sign-in & security
+                  </Link>
+                </>
               )}
             </div>
           </section>

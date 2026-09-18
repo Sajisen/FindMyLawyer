@@ -44,3 +44,34 @@ export const profileImageUploadLimiter = rateLimit({
     message: "Too many profile image changes were sent. Please wait and try again.",
   },
 });
+
+export const accountOtpRequestLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 8,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    message: "Too many verification-code requests. Please wait and try again.",
+  },
+});
+
+export const accountOtpVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    message: "Too many verification attempts. Please wait and try again.",
+  },
+});
+
+export const accountSecurityLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 20,
+  keyGenerator: (req) => String(req.user.userId),
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    message: "Too many account-security changes. Please wait and try again.",
+  },
+});

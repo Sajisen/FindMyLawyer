@@ -12,14 +12,10 @@ export const protect = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await User.findById(decoded.userId)
-      .select("_id role email")
+      .select("_id role email isActive authVersion")
       .lean();
 
     if (!user) {
@@ -28,10 +24,26 @@ export const protect = async (req, res, next) => {
       });
     }
 
+    if (user.isActive === false) {
+      return res.status(403).json({
+        message: "This account has been disabled. Contact an administrator if you believe this is a mistake.",
+      });
+    }
+
+    const currentVersion = Number(user.authVersion || 0);
+    const tokenVersion = Number(decoded.authVersion || 0);
+
+    if (currentVersion !== tokenVersion) {
+      return res.status(401).json({
+        message: "Your sign-in session is no longer valid. Please sign in again.",
+      });
+    }
+
     req.user = {
       userId: user._id,
       role: user.role,
       email: user.email,
+      authVersion: currentVersion,
     };
 
     next();

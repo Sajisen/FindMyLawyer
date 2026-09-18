@@ -154,11 +154,6 @@ export function SavedLawyersProvider({ children }) {
         return;
       }
 
-      if (isGuest) {
-        // Remove IDs whose profiles are no longer publicly available.
-        writeGuestSavedIds(data.savedIds);
-      }
-
       applyCollection(data);
 
       if (isClient) {
@@ -217,7 +212,10 @@ export function SavedLawyersProvider({ children }) {
             return;
           }
 
-          writeGuestSavedIds(data.savedIds);
+          // Keep the raw device IDs even when a profile is temporarily not
+          // public (for example, an admin-disabled lawyer). The visible
+          // collection still contains only public profiles, but a temporary
+          // availability change must not silently destroy the guest's save.
           applyCollection(data);
           return;
         }
@@ -265,7 +263,6 @@ export function SavedLawyersProvider({ children }) {
           if (requestVersion !== requestVersionRef.current) {
             return;
           }
-          writeGuestSavedIds(data.savedIds);
           applyCollection(data);
           setError("");
         })
@@ -299,9 +296,22 @@ export function SavedLawyersProvider({ children }) {
       const data = await syncGuestSavedLawyers(guestIds, token);
       applyCollection(data);
 
-      // Clear only after the server confirms the union. A network/server
-      // failure leaves the device saves intact so the user can retry safely.
-      clearGuestSavedIds();
+      // Remove only IDs the server confirms were synchronized. Temporarily
+      // unavailable/non-public IDs stay on this device instead of being lost.
+      // A later login can offer them again if those profiles become public.
+      const synchronized = new Set(
+        (data.synchronizedIds || []).map((id) => String(id))
+      );
+      const remainingGuestIds = guestIds.filter(
+        (id) => !synchronized.has(String(id))
+      );
+
+      if (remainingGuestIds.length > 0) {
+        writeGuestSavedIds(remainingGuestIds);
+      } else {
+        clearGuestSavedIds();
+      }
+
       dismissedMergeUserRef.current = userKey;
       setGuestMergePrompt(null);
     } catch (requestError) {

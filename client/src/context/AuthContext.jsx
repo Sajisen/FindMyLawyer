@@ -89,6 +89,51 @@ export function AuthProvider({ children }) {
     return data.user;
   }
 
+
+  function acceptSecuritySession(data) {
+    if (!data?.token || !data?.user) {
+      throw new Error("The server did not return a valid updated session.");
+    }
+
+    localStorage.setItem("token", data.token);
+    setToken(data.token);
+    setUser(data.user);
+  }
+
+  async function requestEmailChange(details) {
+    if (!token) throw new Error("You need to sign in first.");
+
+    return apiRequest("/auth/me/email-change/request", {
+      method: "POST",
+      token,
+      body: details,
+    });
+  }
+
+  async function verifyEmailChange(details) {
+    if (!token) throw new Error("You need to sign in first.");
+
+    const data = await apiRequest("/auth/me/email-change/verify", {
+      method: "POST",
+      token,
+      body: details,
+    });
+    acceptSecuritySession(data);
+    return data;
+  }
+
+  async function changePassword(details) {
+    if (!token) throw new Error("You need to sign in first.");
+
+    const data = await apiRequest("/auth/me/password/change", {
+      method: "POST",
+      token,
+      body: details,
+    });
+    acceptSecuritySession(data);
+    return data;
+  }
+
   function logout() {
     localStorage.removeItem("token");
 
@@ -105,6 +150,9 @@ export function AuthProvider({ children }) {
         login,
         register,
         updateAccount,
+        requestEmailChange,
+        verifyEmailChange,
+        changePassword,
         logout,
         isAuthenticated: Boolean(user),
       }}

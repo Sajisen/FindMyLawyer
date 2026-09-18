@@ -153,6 +153,15 @@ export default function Navbar() {
                       <UserIcon />
                       Profile
                     </Link>
+                    <Link
+                      to="/account-security"
+                      role="menuitem"
+                      onClick={closeMenu}
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-brand-black transition hover:bg-brand-background"
+                    >
+                      <LockIcon />
+                      Sign-in & security
+                    </Link>
 
                     {user.role === "admin" && (
                       <Link
@@ -240,6 +249,9 @@ export default function Navbar() {
                 <MobileNavLink to="/profile" onClick={closeMenu}>
                   Profile
                 </MobileNavLink>
+                <MobileNavLink to="/account-security" onClick={closeMenu}>
+                  Sign-in & security
+                </MobileNavLink>
                 {user.role === "admin" && (
                   <MobileNavLink to="/admin" onClick={closeMenu}>
                     Admin panel
@@ -314,6 +326,15 @@ function UserIcon() {
     <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
       <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.6" />
       <path d="M5.5 19c.8-3.2 3.2-5 6.5-5s5.7 1.8 6.5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
+      <rect x="6" y="10" width="12" height="9" rx="2" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
     </svg>
   );
 }
