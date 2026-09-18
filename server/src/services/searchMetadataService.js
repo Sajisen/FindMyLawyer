@@ -9,6 +9,78 @@ function normalize(value = "") {
   return String(value).trim().toLowerCase();
 }
 
+
+async function backfillLawyerLocationIds() {
+  const [locations, profiles] = await Promise.all([
+    Location.find({}).select("_id city district province").lean(),
+    LawyerProfile.find({
+      $or: [
+        { locationId: { $exists: false } },
+        { locationId: null },
+        { "pendingProfileChanges.officeCity": { $exists: true } },
+      ],
+    })
+      .select("_id locationId officeCity district province pendingProfileChanges")
+      .lean(),
+  ]);
+
+  if (!locations.length || !profiles.length) {
+    return 0;
+  }
+
+  const byKey = new Map(
+    locations.map((location) => [
+      [location.city, location.district, location.province]
+        .map((value) => normalize(value))
+        .join("|"),
+      location,
+    ])
+  );
+  const operations = [];
+
+  for (const profile of profiles) {
+    const updates = {};
+
+    if (!profile.locationId && profile.officeCity && profile.district && profile.province) {
+      const key = [profile.officeCity, profile.district, profile.province]
+        .map((value) => normalize(value))
+        .join("|");
+      const location = byKey.get(key);
+      if (location) updates.locationId = location._id;
+    }
+
+    const pending = profile.pendingProfileChanges;
+    if (
+      pending?.officeCity &&
+      pending?.district &&
+      pending?.province &&
+      !pending?.locationId
+    ) {
+      const key = [pending.officeCity, pending.district, pending.province]
+        .map((value) => normalize(value))
+        .join("|");
+      const location = byKey.get(key);
+      if (location) updates["pendingProfileChanges.locationId"] = location._id;
+    }
+
+    if (Object.keys(updates).length) {
+      operations.push({
+        updateOne: {
+          filter: { _id: profile._id },
+          update: { $set: updates },
+        },
+      });
+    }
+  }
+
+  if (!operations.length) {
+    return 0;
+  }
+
+  const result = await LawyerProfile.bulkWrite(operations, { ordered: false });
+  return result.modifiedCount || 0;
+}
+
 export async function ensureSearchMetadata() {
   const categoryCount = await LegalCategory.countDocuments();
 
@@ -82,6 +154,13 @@ export async function ensureSearchMetadata() {
       );
     }
   }
+
+  const backfilledLocations = await backfillLawyerLocationIds();
+  if (backfilledLocations > 0) {
+    console.log(
+      `Search metadata: linked ${backfilledLocations} existing lawyer profiles to controlled locations.`
+    );
+  }
 }
 
 export async function getActiveLegalCategories() {
@@ -117,10 +196,17 @@ export async function getActiveLocation({ locationId = "", city = "" } = {}) {
     return null;
   }
 
-  return Location.findOne({
+  const matches = await Location.find({
     normalizedCity: normalize(city),
     isActive: true,
-  }).lean();
+  })
+    .limit(2)
+    .lean();
+
+  // City names are not guaranteed to be globally unique. Old URLs/clients may
+  // still send only a city string, so accept that fallback only when it maps
+  // to exactly one active controlled location. Modern clients send locationId.
+  return matches.length === 1 ? matches[0] : null;
 }
 
 export async function getActiveLocations() {

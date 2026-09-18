@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+import { locationKey, normalize } from "../data/buildLocationCatalog.js";
+
 const locationSchema = new mongoose.Schema(
   {
     city: {
@@ -44,6 +46,14 @@ locationSchema.index({ normalizedCity: 1 });
 locationSchema.index({ city: 1 });
 locationSchema.index({ district: 1 });
 locationSchema.index({ province: 1 });
+
+locationSchema.pre("validate", function normalizeLocationRecord() {
+  this.city = String(this.city || "").trim().replace(/\s+/g, " ");
+  this.district = String(this.district || "").trim().replace(/\s+/g, " ");
+  this.province = String(this.province || "").trim().replace(/\s+/g, " ");
+  this.normalizedCity = normalize(this.city);
+  this.locationKey = locationKey(this);
+});
 
 const Location = mongoose.model("Location", locationSchema, "locations");
 

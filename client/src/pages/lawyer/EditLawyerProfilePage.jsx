@@ -3,6 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/useAuth.js";
 import { apiRequest } from "../../services/api.js";
+import LawyerAvatar from "../../features/lawyers/components/LawyerAvatar.jsx";
+import {
+  removeMyLawyerProfileImage,
+  uploadMyLawyerProfileImage,
+} from "../../features/lawyers/lawyerApi.js";
 import LocationAutocomplete from "../../features/search/components/LocationAutocomplete.jsx";
 import useLegalCategories from "../../features/search/hooks/useLegalCategories.js";
 import {
@@ -39,6 +44,8 @@ export default function EditLawyerProfilePage() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [imageBusy, setImageBusy] = useState(false);
+  const [imageNotice, setImageNotice] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -136,6 +143,69 @@ export default function EditLawyerProfilePage() {
           .filter(Boolean)
       ),
     ];
+  }
+
+  async function handleImageUpload(event) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+    if (!allowedTypes.has(file.type)) {
+      setError("Choose a JPEG, PNG, or WebP profile image.");
+      input.value = "";
+      return;
+    }
+
+    if (file.size > 4 * 1024 * 1024) {
+      setError("Profile images must be 4 MB or smaller.");
+      input.value = "";
+      return;
+    }
+
+    setImageBusy(true);
+    setImageNotice("");
+    setError("");
+
+    try {
+      const data = await uploadMyLawyerProfileImage(file, token);
+      setProfile((previous) => ({
+        ...previous,
+        profileImageUrl: data.profileImageUrl || "",
+      }));
+      setImageNotice(data.message || "Profile image updated.");
+    } catch (requestError) {
+      setError(requestError.message || "Unable to upload profile image.");
+    } finally {
+      setImageBusy(false);
+      input.value = "";
+    }
+  }
+
+  async function handleRemoveImage() {
+    if (!profile?.profileImageUrl || imageBusy) {
+      return;
+    }
+
+    setImageBusy(true);
+    setImageNotice("");
+    setError("");
+
+    try {
+      const data = await removeMyLawyerProfileImage(token);
+      setProfile((previous) => ({
+        ...previous,
+        profileImageUrl: data.profileImageUrl || "",
+      }));
+      setImageNotice(data.message || "Profile image removed.");
+    } catch (requestError) {
+      setError(requestError.message || "Unable to remove profile image.");
+    } finally {
+      setImageBusy(false);
+    }
   }
 
   async function handleSubmit(event) {
@@ -245,6 +315,55 @@ export default function EditLawyerProfilePage() {
             {error}
           </div>
         )}
+
+        {imageNotice && (
+          <div className="mb-6 rounded-xl border border-green-200 bg-green-50 px-5 py-4 text-green-800">
+            {imageNotice}
+          </div>
+        )}
+
+        <section className="mb-6 rounded-3xl border border-brand-border bg-white p-6 shadow-sm sm:p-8">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <LawyerAvatar
+              lawyer={profile}
+              name={form.displayName || profile?.displayName}
+              className="h-28 w-28 rounded-3xl text-3xl"
+            />
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-extrabold text-brand-black">Profile image</h2>
+              <p className="mt-1 text-sm leading-6 text-brand-muted">
+                Upload a clear professional photo. JPEG, PNG, and WebP files up to 4 MB are supported.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <label className={`cursor-pointer rounded-xl bg-brand-yellow px-4 py-2.5 text-sm font-bold text-brand-black transition hover:bg-brand-yellow-dark ${imageBusy ? "pointer-events-none opacity-60" : ""}`}>
+                  {imageBusy ? "Updating..." : profile?.profileImageUrl ? "Replace image" : "Upload image"}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="sr-only"
+                    disabled={imageBusy}
+                    onChange={handleImageUpload}
+                  />
+                </label>
+                {profile?.profileImageUrl && (
+                  <button
+                    type="button"
+                    disabled={imageBusy}
+                    onClick={handleRemoveImage}
+                    className="rounded-xl border border-brand-border bg-white px-4 py-2.5 text-sm font-bold text-brand-black transition hover:bg-brand-background disabled:opacity-60"
+                  >
+                    Remove image
+                  </button>
+                )}
+              </div>
+              {profile?.isPublished && (
+                <p className="mt-3 text-xs leading-5 text-brand-muted">
+                  Profile image changes take effect immediately and do not replace your approved professional details.
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
 
         <form
           onSubmit={handleSubmit}

@@ -1,21 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 
 import SaveLawyerButton from "./SaveLawyerButton.jsx";
+import LawyerAvatar from "./LawyerAvatar.jsx";
 import { legalCategories } from "../../search/data/searchOptions.js";
 
 const fallbackCategoryNames = Object.fromEntries(
   legalCategories.map((category) => [category.id, category.name])
 );
-
-function getInitials(name = "") {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-}
 
 function getPracticeAreas(lawyer) {
   return Array.from(
@@ -71,9 +62,7 @@ export default function LawyerCard({
     return (
       <article className="group flex min-h-[390px] flex-col rounded-2xl border border-brand-border bg-white p-5 transition duration-200 hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-lg hover:shadow-black/[0.04] sm:p-6">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-brand-yellow-soft text-lg font-extrabold text-brand-black">
-            {getInitials(lawyer.displayName)}
-          </div>
+          <LawyerAvatar lawyer={lawyer} />
           <SaveLawyerButton lawyer={lawyer} iconOnly />
         </div>
 
@@ -157,9 +146,7 @@ export default function LawyerCard({
   return (
     <article className="group rounded-2xl border border-brand-border bg-white p-5 transition duration-200 hover:border-neutral-300 hover:shadow-lg hover:shadow-black/[0.035] sm:p-6">
       <div className="flex flex-col gap-5 sm:flex-row">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-brand-yellow-soft text-lg font-extrabold text-brand-black">
-          {getInitials(lawyer.displayName)}
-        </div>
+        <LawyerAvatar lawyer={lawyer} />
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

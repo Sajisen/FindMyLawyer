@@ -218,6 +218,7 @@ export const registerLawyer = async (req, res) => {
       email,
       phone,
       normalizedPhone,
+      locationId: location._id,
       province: location.province,
       district: location.district,
       officeCity: location.city,

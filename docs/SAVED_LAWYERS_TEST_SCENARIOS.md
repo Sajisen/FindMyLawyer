@@ -41,26 +41,36 @@ Expected:
 - Save button works;
 - Back returns to the originating search URL or Saved Lawyers page.
 
-## 4. Guest to new client registration merge
+## 4. Guest to new client registration merge confirmation
 
 1. Sign out.
 2. Save lawyers A and B.
 3. Register a new client account.
-4. Open Saved Lawyers.
+4. Wait for the account saved list to load.
 
 Expected:
 
-- A and B are now saved to the account;
-- local guest storage is cleared only after the successful sync;
-- refreshing while signed in still shows A and B.
+- A and B are **not** merged automatically;
+- a modal names the signed-in account and explains that 2 lawyers were saved on this device while signed out;
+- choosing `Keep separate` closes the modal, leaves A and B in guest localStorage, and shows only the account's server-side saves while signed in;
+- after signing out, A and B are still available to the guest on that device.
 
-## 5. Existing client union merge
+Repeat, then choose `Merge into <account name>`.
+
+Expected:
+
+- A and B are union-merged into the account;
+- local guest storage is cleared only after the successful sync;
+- refreshing while signed in still shows the merged account list.
+
+## 5. Existing client union merge with confirmation
 
 Prepare an account that already has A, B and C saved.
 
 1. Sign out.
 2. As a guest save B, D and E.
 3. Sign back into that client account.
+4. Confirm the merge in the modal.
 
 Expected account result:
 
@@ -68,20 +78,25 @@ Expected account result:
 A, B, C, D, E
 ```
 
-There must be no duplicate B and no existing account save may be removed.
+There must be no duplicate B and no existing account save may be removed. Before the user confirms, the account list must remain A, B and C only.
 
-## 6. Logout and later merge
+## 6. Logout, keep separate, and later merge
 
 1. Sign in as a client and confirm account saves exist.
 2. Sign out.
 3. Save a different lawyer X as a guest.
 4. Sign back into the same client account.
+5. Choose `Keep separate`.
+6. Sign out again and confirm X is still present for the guest.
+7. Sign back into the client account and choose `Merge`.
 
 Expected:
 
+- the modal is offered again on the new login session;
 - existing account saves remain;
-- X is added;
-- no duplicates appear.
+- X is added only after explicit confirmation;
+- no duplicates appear;
+- account-only saves are never copied into guest localStorage.
 
 ## 7. Different client account safety
 

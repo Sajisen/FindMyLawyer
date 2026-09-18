@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { PROFILE_IMAGE_DIRECTORY } from "./services/profileImageStorage.js";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 
@@ -17,6 +18,19 @@ app.use(helmet());
 app.use(
   cors({
     origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+  })
+);
+
+app.use(
+  "/uploads/profile-images",
+  express.static(PROFILE_IMAGE_DIRECTORY, {
+    dotfiles: "deny",
+    index: false,
+    setHeaders: (res) => {
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+      res.setHeader("X-Content-Type-Options", "nosniff");
+      res.setHeader("Cache-Control", "public, max-age=3600");
+    },
   })
 );
 

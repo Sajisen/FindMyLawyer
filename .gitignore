@@ -20,3 +20,7 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Development-only lawyer profile images
+server/uploads/profile-images/*
+!server/uploads/profile-images/.gitkeep

@@ -28,7 +28,7 @@ Expected:
 
 - login succeeds;
 - user returns to the requested client page when applicable, otherwise Home;
-- saved guest lawyers synchronize to the account.
+- if the device has guest Saved Lawyers, a confirmation modal appears; nothing is merged until the client explicitly chooses to merge.
 
 Wrong password expected: `Invalid email or password.`
 

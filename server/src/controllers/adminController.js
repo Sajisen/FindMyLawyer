@@ -138,6 +138,7 @@ export const decideLawyer = async (req, res) => {
   const { id } = req.params;
   const { decision, reason = "", rejectionScope } = req.body || {};
   const cleanReason = typeof reason === "string" ? reason.trim() : "";
+  const decisionReason = decision === "rejected" ? cleanReason : "";
 
   if (
     !mongoose.isValidObjectId(id) ||
@@ -193,6 +194,17 @@ export const decideLawyer = async (req, res) => {
         throw error;
       }
 
+      const currentReviewStatus = reviewStatusOf(lawyer, verification);
+
+      // "Pending" is a no-op choice for items that are already awaiting
+      // review. Do not let a stale/legacy client use it to silently unpublish
+      // an approved lawyer or erase a rejected state.
+      if (decision === "pending" && currentReviewStatus !== "pending") {
+        const error = new Error("INVALID_PENDING_TRANSITION");
+        error.statusCode = 409;
+        throw error;
+      }
+
       const previous = {
         status: statusOf(lawyer, verification),
         isPublished: lawyer.isPublished,
@@ -221,7 +233,7 @@ export const decideLawyer = async (req, res) => {
         } else if (decision === "rejected") {
           lawyer.pendingProfileChanges = null;
           lawyer.pendingProfileChangesSubmittedAt = null;
-          lawyer.profileUpdateRejectionReason = cleanReason;
+          lawyer.profileUpdateRejectionReason = decisionReason;
         }
         // A pending material update never removes an already-approved public
         // profile and never changes the underlying document-verification state.
@@ -233,14 +245,14 @@ export const decideLawyer = async (req, res) => {
 
         lawyer.isPublished = decision === "approved";
         lawyer.rejectionReason =
-          decision === "rejected" ? cleanReason : null;
+          decision === "rejected" ? decisionReason : null;
         lawyer.verifiedAt = decision === "approved" ? new Date() : null;
         lawyer.verifiedBy =
           decision === "approved" ? req.user.userId : null;
 
         if (verification) {
           verification.status = decision;
-          verification.reason = decision === "rejected" ? cleanReason : "";
+          verification.reason = decision === "rejected" ? decisionReason : "";
           verification.rejectionScope = normalizedScope;
           verification.reviewedBy = req.user.userId;
           verification.reviewedAt = new Date();
@@ -260,14 +272,14 @@ export const decideLawyer = async (req, res) => {
           status: finalReviewStatus,
           decision,
           isPublished: lawyer.isPublished,
-          reason: cleanReason,
+          reason: decisionReason,
           rejectionScope:
             !profileUpdate && decision === "rejected"
               ? normalizeVerificationRejectionScope(rejectionScope)
               : verification?.rejectionScope || null,
           pendingProfileChanges: lawyer.pendingProfileChanges || null,
         },
-        cleanReason,
+        decisionReason,
         session
       );
 
@@ -287,6 +299,13 @@ export const decideLawyer = async (req, res) => {
       return res.status(409).json({
         message:
           "Verification documents are required before approving a new lawyer.",
+      });
+    }
+
+    if (error.message === "INVALID_PENDING_TRANSITION") {
+      return res.status(409).json({
+        message:
+          "Only an application that is already awaiting review can be kept pending.",
       });
     }
 

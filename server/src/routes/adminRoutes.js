@@ -10,6 +10,13 @@ import {
 } from "../controllers/adminController.js";
 
 import { getLawyerVerification, viewFile } from "../controllers/verificationController.js";
+import {
+  createAdminLocation,
+  deleteAdminLocation,
+  getAdminLocationDivisions,
+  getAdminLocations,
+  updateAdminLocation,
+} from "../controllers/locationAdminController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { allowRoles } from "../middleware/roleMiddleware.js";
 
@@ -29,6 +36,12 @@ router.get("/lawyers/:id/activity", getLawyerActivity);
 router.get("/lawyers/:lawyerId/verification/submissions/:submissionId/files/:fileId", viewFile);
 router.patch("/lawyers/:id/decision", decideLawyer);
 router.get("/activity", getAdminActivity);
+
+router.get("/locations/divisions", getAdminLocationDivisions);
+router.get("/locations", getAdminLocations);
+router.post("/locations", createAdminLocation);
+router.patch("/locations/:id", updateAdminLocation);
+router.delete("/locations/:id", deleteAdminLocation);
 
 router.patch("/lawyers/:id/approve", approveLawyer);
 

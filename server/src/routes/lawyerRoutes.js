@@ -9,9 +9,16 @@ import {
 } from "../controllers/lawyerController.js";
 
 import { getMine, submit, viewFile } from "../controllers/verificationController.js";
+import {
+  removeMyProfileImage,
+  uploadMyProfileImage,
+} from "../controllers/profileImageController.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { allowRoles } from "../middleware/roleMiddleware.js";
-import { verificationUploadLimiter } from "../middleware/rateLimiters.js";
+import {
+  profileImageUploadLimiter,
+  verificationUploadLimiter,
+} from "../middleware/rateLimiters.js";
 
 const router = express.Router();
 
@@ -33,6 +40,22 @@ router.patch(
   protect,
   allowRoles("lawyer"),
   updateMyLawyerProfile
+);
+
+router.put(
+  "/me/profile-image",
+  protect,
+  allowRoles("lawyer"),
+  profileImageUploadLimiter,
+  express.raw({ type: () => true, limit: "4mb" }),
+  uploadMyProfileImage
+);
+
+router.delete(
+  "/me/profile-image",
+  protect,
+  allowRoles("lawyer"),
+  removeMyProfileImage
 );
 
 router.get("/me/verification", protect, allowRoles("lawyer"), getMine);

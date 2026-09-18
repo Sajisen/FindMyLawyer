@@ -4,16 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth.js";
 import { apiRequest } from "../../services/api.js";
 import useLegalCategories from "../../features/search/hooks/useLegalCategories.js";
-
-function getInitials(name = "") {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-}
+import LawyerAvatar from "../../features/lawyers/components/LawyerAvatar.jsx";
 
 export default function LawyerDashboardPage() {
   const { user, token } = useAuth();
@@ -191,9 +182,10 @@ export default function LawyerDashboardPage() {
             <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_330px]">
               <section className="rounded-3xl border border-brand-border bg-white p-6 shadow-sm sm:p-8">
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-                  <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-3xl bg-brand-yellow-soft text-3xl font-extrabold text-brand-black">
-                    {getInitials(profile.displayName)}
-                  </div>
+                  <LawyerAvatar
+                    lawyer={profile}
+                    className="h-28 w-28 rounded-3xl text-3xl"
+                  />
 
                   <div className="min-w-0">
                     <p className="text-xs font-bold uppercase tracking-[0.1em] text-brand-muted">

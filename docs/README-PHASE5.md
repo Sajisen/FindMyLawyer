@@ -4,12 +4,14 @@
 
 Phase 5 was built on top of the merged `main` state that includes Amri's client/lawyer registration, login, lawyer dashboard, and admin dashboard work, together with the existing Manual Search and switchable Gemini/DeepSeek Advanced Search implementation.
 
-The main additions are:
+> **Current behavior note (18 Sep 2026):** The original Phase 5 implementation automatically synchronized guest saves at login. That behavior has since been hardened for shared-device privacy: the account list loads first and the user must explicitly confirm a guest-save merge. The union/idempotency rules documented below still apply after confirmation.
+
+The main additions were:
 
 - public detailed lawyer profile pages;
 - Saved Lawyers for guests using localStorage;
 - persistent Saved Lawyers for registered client accounts using MongoDB;
-- automatic guest-to-client saved-list synchronization at login/registration;
+- guest-to-client saved-list synchronization (now requires explicit confirmation at login/registration);
 - duplicate-safe union merge behavior;
 - save/remove controls on search cards and profile pages;
 - a Saved Lawyers page;
@@ -43,7 +45,7 @@ A unique compound index on `userId + lawyerId` prevents duplicate saves at datab
 
 ### Login synchronization
 
-When a client logs in or creates a client account:
+When a client logs in or creates a client account, the current implementation first loads the account list and then asks whether device-level guest saves should be merged. Only after explicit confirmation does it run:
 
 ```text
 guest local IDs
@@ -77,7 +79,7 @@ Guest localStorage is cleared only after a successful server sync. This prevents
 
 ### Logout behavior
 
-Account saves remain in MongoDB. They are not copied into guest localStorage on logout. A user can then save new profiles as a guest; those new local saves are merged into the account on the next client login.
+Account saves remain in MongoDB. They are not copied into guest localStorage on logout. A user can then save new profiles as a guest; on the next client login those device saves remain separate until the client explicitly confirms the merge. Choosing Keep separate preserves the guest list for a later signed-out session.
 
 ## Saved Lawyers API
 

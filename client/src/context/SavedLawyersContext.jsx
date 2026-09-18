@@ -93,11 +93,15 @@ export function SavedLawyersProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busyIds, setBusyIds] = useState([]);
+  const [guestMergePrompt, setGuestMergePrompt] = useState(null);
+  const [mergeBusy, setMergeBusy] = useState(false);
   const requestVersionRef = useRef(0);
+  const dismissedMergeUserRef = useRef("");
 
   const isClient = !authLoading && user?.role === "client";
   const isGuest = !authLoading && !user;
   const canSave = isGuest || isClient;
+  const userKey = String(user?.id || user?._id || "");
 
   const applyCollection = useCallback((data) => {
     const lawyers = Array.isArray(data?.lawyers) ? data.lawyers : [];
@@ -109,6 +113,26 @@ export function SavedLawyersProvider({ children }) {
     setSavedLawyers(lawyers);
   }, []);
 
+  const offerGuestMergeIfNeeded = useCallback(
+    (guestIds) => {
+      if (
+        !isClient ||
+        !userKey ||
+        !guestIds.length ||
+        dismissedMergeUserRef.current === userKey
+      ) {
+        setGuestMergePrompt(null);
+        return;
+      }
+
+      setGuestMergePrompt({
+        count: guestIds.length,
+        accountName: user?.name || user?.email || "this account",
+      });
+    },
+    [isClient, user?.email, user?.name, userKey]
+  );
+
   const refreshSaved = useCallback(async () => {
     const requestVersion = requestVersionRef.current + 1;
     requestVersionRef.current = requestVersion;
@@ -117,14 +141,9 @@ export function SavedLawyersProvider({ children }) {
 
     try {
       let data;
-      let clearGuestAfterSuccess = false;
 
       if (isClient && token) {
-        const guestIds = readGuestSavedIds();
-        data = guestIds.length
-          ? await syncGuestSavedLawyers(guestIds, token)
-          : await getSavedLawyers(token);
-        clearGuestAfterSuccess = guestIds.length > 0;
+        data = await getSavedLawyers(token);
       } else if (isGuest) {
         data = await loadGuestCollection(readGuestSavedIds());
       } else {
@@ -135,16 +154,16 @@ export function SavedLawyersProvider({ children }) {
         return;
       }
 
-      if (clearGuestAfterSuccess) {
-        clearGuestSavedIds();
-      }
-
       if (isGuest) {
-        // Remove local IDs whose profiles are no longer publicly available.
+        // Remove IDs whose profiles are no longer publicly available.
         writeGuestSavedIds(data.savedIds);
       }
 
       applyCollection(data);
+
+      if (isClient) {
+        offerGuestMergeIfNeeded(readGuestSavedIds());
+      }
     } catch (requestError) {
       if (requestVersion === requestVersionRef.current) {
         setError(requestError.message || "Unable to load saved lawyers.");
@@ -154,7 +173,7 @@ export function SavedLawyersProvider({ children }) {
         setLoading(false);
       }
     }
-  }, [applyCollection, isClient, isGuest, token]);
+  }, [applyCollection, isClient, isGuest, offerGuestMergeIfNeeded, token]);
 
   useEffect(() => {
     if (authLoading) {
@@ -171,27 +190,27 @@ export function SavedLawyersProvider({ children }) {
 
       try {
         if (isClient && token) {
-          const guestIds = readGuestSavedIds();
-          const data = guestIds.length
-            ? await syncGuestSavedLawyers(guestIds, token)
-            : await getSavedLawyers(token);
+          // Privacy rule: device-level guest saves are never merged merely
+          // because somebody logged in. Load the account first, then ask for
+          // explicit consent before performing the union sync.
+          const data = await getSavedLawyers(token);
 
           if (cancelled || requestVersion !== requestVersionRef.current) {
             return;
           }
 
           applyCollection(data);
-
-          // Do not keep account-linked saves in guest storage. This prevents
-          // one account's saved list leaking into another account on a shared
-          // browser. Guest IDs are cleared only after a successful union sync.
-          if (guestIds.length) {
-            clearGuestSavedIds();
-          }
+          offerGuestMergeIfNeeded(readGuestSavedIds());
           return;
         }
 
         if (isGuest) {
+          // Logging out starts a new guest session. If the same client later
+          // logs in again, ask again rather than carrying an old dismissal
+          // across authentication sessions on a shared device.
+          dismissedMergeUserRef.current = "";
+          setGuestMergePrompt(null);
+
           const data = await loadGuestCollection(readGuestSavedIds());
 
           if (cancelled || requestVersion !== requestVersionRef.current) {
@@ -203,6 +222,7 @@ export function SavedLawyersProvider({ children }) {
           return;
         }
 
+        setGuestMergePrompt(null);
         if (!cancelled && requestVersion === requestVersionRef.current) {
           applyCollection({ savedIds: [], lawyers: [] });
         }
@@ -211,28 +231,8 @@ export function SavedLawyersProvider({ children }) {
           return;
         }
 
-        setError(
-          requestError.message || "Unable to synchronize saved lawyers."
-        );
-
-        // Guest IDs stay in localStorage so synchronization can be retried.
-        // Do not present unsynchronized guest IDs as account saves because that
-        // could make a later remove action look successful while the pending
-        // local ID silently remains. Prefer the canonical account list when
-        // it can still be loaded.
-        if (isClient && token) {
-          try {
-            const accountData = await getSavedLawyers(token);
-
-            if (!cancelled && requestVersion === requestVersionRef.current) {
-              applyCollection(accountData);
-            }
-          } catch {
-            if (!cancelled && requestVersion === requestVersionRef.current) {
-              applyCollection({ savedIds: [], lawyers: [] });
-            }
-          }
-        }
+        setError(requestError.message || "Unable to load saved lawyers.");
+        applyCollection({ savedIds: [], lawyers: [] });
       } finally {
         if (!cancelled && requestVersion === requestVersionRef.current) {
           setLoading(false);
@@ -245,7 +245,7 @@ export function SavedLawyersProvider({ children }) {
     return () => {
       cancelled = true;
     };
-  }, [applyCollection, authLoading, isClient, isGuest, token]);
+  }, [applyCollection, authLoading, isClient, isGuest, offerGuestMergeIfNeeded, token]);
 
   useEffect(() => {
     if (!isGuest) {
@@ -271,9 +271,7 @@ export function SavedLawyersProvider({ children }) {
         })
         .catch((requestError) => {
           if (requestVersion === requestVersionRef.current) {
-            setError(
-              requestError.message || "Unable to refresh saved lawyers."
-            );
+            setError(requestError.message || "Unable to refresh saved lawyers.");
           }
         });
     }
@@ -281,6 +279,42 @@ export function SavedLawyersProvider({ children }) {
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, [applyCollection, isGuest]);
+
+  const mergeGuestSaved = useCallback(async () => {
+    if (!isClient || !token || mergeBusy) {
+      return;
+    }
+
+    const guestIds = readGuestSavedIds();
+
+    if (!guestIds.length) {
+      setGuestMergePrompt(null);
+      return;
+    }
+
+    setMergeBusy(true);
+    setError("");
+
+    try {
+      const data = await syncGuestSavedLawyers(guestIds, token);
+      applyCollection(data);
+
+      // Clear only after the server confirms the union. A network/server
+      // failure leaves the device saves intact so the user can retry safely.
+      clearGuestSavedIds();
+      dismissedMergeUserRef.current = userKey;
+      setGuestMergePrompt(null);
+    } catch (requestError) {
+      setError(requestError.message || "Unable to merge saved lawyers.");
+    } finally {
+      setMergeBusy(false);
+    }
+  }, [applyCollection, isClient, mergeBusy, token, userKey]);
+
+  const keepGuestSavedSeparate = useCallback(() => {
+    dismissedMergeUserRef.current = userKey;
+    setGuestMergePrompt(null);
+  }, [userKey]);
 
   const isSaved = useCallback(
     (lawyerId) => savedIds.includes(String(lawyerId)),
@@ -313,36 +347,12 @@ export function SavedLawyersProvider({ children }) {
         if (isClient && token) {
           if (currentlySaved) {
             await removeLawyerFromAccount(lawyerId, token);
-
-            // If this ID is also waiting in guest storage after an earlier
-            // failed synchronization, remove it there too so a retry cannot
-            // unexpectedly re-save a lawyer the client just removed.
-            const pendingGuestIds = readGuestSavedIds();
-            if (pendingGuestIds.includes(lawyerId)) {
-              writeGuestSavedIds(
-                pendingGuestIds.filter((id) => id !== lawyerId)
-              );
-            }
-
-            setSavedIds((previous) =>
-              previous.filter((id) => id !== lawyerId)
-            );
+            setSavedIds((previous) => previous.filter((id) => id !== lawyerId));
             setSavedLawyers((previous) =>
               previous.filter((item) => String(item._id) !== lawyerId)
             );
           } else {
             const data = await saveLawyerToAccount(lawyerId, token);
-
-            // A direct account save makes any matching pending guest ID
-            // redundant. Removing it keeps future synchronization idempotent
-            // and easier to reason about.
-            const pendingGuestIds = readGuestSavedIds();
-            if (pendingGuestIds.includes(lawyerId)) {
-              writeGuestSavedIds(
-                pendingGuestIds.filter((id) => id !== lawyerId)
-              );
-            }
-
             setSavedIds((previous) => normalizeIds([lawyerId, ...previous]));
             setSavedLawyers((previous) =>
               mergeLawyerIntoList(previous, data.lawyer || lawyer)
@@ -381,9 +391,7 @@ export function SavedLawyersProvider({ children }) {
         setError(requestError.message || "Unable to update saved lawyers.");
         throw requestError;
       } finally {
-        setBusyIds((previous) =>
-          previous.filter((id) => id !== lawyerId)
-        );
+        setBusyIds((previous) => previous.filter((id) => id !== lawyerId));
       }
     },
     [canSave, isBusy, isClient, isGuest, savedIds, token]
@@ -423,7 +431,81 @@ export function SavedLawyersProvider({ children }) {
   return (
     <SavedLawyersContext.Provider value={value}>
       {children}
+      {guestMergePrompt && isClient && (
+        <GuestSaveMergeDialog
+          accountName={guestMergePrompt.accountName}
+          count={guestMergePrompt.count}
+          busy={mergeBusy}
+          onMerge={mergeGuestSaved}
+          onKeepSeparate={keepGuestSavedSeparate}
+        />
+      )}
     </SavedLawyersContext.Provider>
   );
 }
 
+function GuestSaveMergeDialog({
+  accountName,
+  count,
+  busy,
+  onMerge,
+  onKeepSeparate,
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/45 px-4 py-8 backdrop-blur-[2px]"
+      role="presentation"
+    >
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="saved-lawyer-merge-title"
+        aria-describedby="saved-lawyer-merge-description"
+        className="w-full max-w-lg rounded-3xl border border-brand-border bg-white p-6 shadow-2xl sm:p-7"
+      >
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-yellow-soft text-xl" aria-hidden="true">
+          ★
+        </div>
+        <h2
+          id="saved-lawyer-merge-title"
+          className="mt-5 text-2xl font-extrabold tracking-tight text-brand-black"
+        >
+          Merge saved lawyers into {accountName}?
+        </h2>
+        <p
+          id="saved-lawyer-merge-description"
+          className="mt-3 text-sm leading-6 text-brand-muted"
+        >
+          {count} {count === 1 ? "lawyer was" : "lawyers were"} saved on this
+          device while nobody was signed in. Because this may be a shared
+          computer, FindMyLawyer will not add them to your account without your
+          confirmation.
+        </p>
+        <div className="mt-5 rounded-2xl border border-brand-border bg-brand-background p-4 text-sm leading-6 text-brand-muted">
+          <strong className="text-brand-black">Merge</strong> adds the device
+          saves to your existing account saves without removing anything.
+          <strong className="ml-1 text-brand-black">Keep separate</strong> leaves
+          them on this device for the signed-out guest session.
+        </div>
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onKeepSeparate}
+            className="rounded-xl border border-brand-border bg-white px-5 py-3 text-sm font-bold text-brand-black transition hover:bg-brand-background disabled:opacity-60"
+          >
+            Keep separate
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onMerge}
+            className="rounded-xl bg-brand-yellow px-5 py-3 text-sm font-extrabold text-brand-black transition hover:bg-brand-yellow-dark disabled:opacity-60"
+          >
+            {busy ? "Merging..." : `Merge into ${accountName}`}
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}

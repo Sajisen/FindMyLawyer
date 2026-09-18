@@ -13,6 +13,7 @@ test("splitProfileUpdates keeps operational fields immediate and professional cl
     languages: ["English"],
     description: "Updated professional description",
     yearsOfPractice: 8,
+    locationId: "507f1f77bcf86cd799439011",
   });
 
   assert.deepEqual(result.immediate, {
@@ -22,6 +23,7 @@ test("splitProfileUpdates keeps operational fields immediate and professional cl
   assert.deepEqual(result.review, {
     description: "Updated professional description",
     yearsOfPractice: 8,
+    locationId: "507f1f77bcf86cd799439011",
   });
 });
 

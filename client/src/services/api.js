@@ -35,3 +35,22 @@ export async function apiRequest(
 
   return data;
 }
+
+export function resolveApiAssetUrl(value) {
+  const assetPath = String(value || "").trim();
+
+  if (!assetPath) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(assetPath)) {
+    return assetPath;
+  }
+
+  try {
+    const apiUrl = new URL(API_URL, window.location.origin);
+    return new URL(assetPath, apiUrl.origin).toString();
+  } catch {
+    return assetPath;
+  }
+}

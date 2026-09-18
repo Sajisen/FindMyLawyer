@@ -7,7 +7,7 @@ export default function SaveLawyerButton({
   compact = false,
   iconOnly = false,
 }) {
-  const { canSave, isSaved, isBusy, toggleSaved } = useSavedLawyers();
+  const { canSave, isSaved, isBusy, loading, toggleSaved } = useSavedLawyers();
   const [failureMessage, setFailureMessage] = useState("");
 
   if (!canSave || !lawyer?._id) {
@@ -15,7 +15,7 @@ export default function SaveLawyerButton({
   }
 
   const saved = isSaved(lawyer._id);
-  const busy = isBusy(lawyer._id);
+  const busy = loading || isBusy(lawyer._id);
 
   async function handleClick() {
     setFailureMessage("");
@@ -27,7 +27,7 @@ export default function SaveLawyerButton({
     }
   }
 
-  const label = busy ? "Saving..." : saved ? "Saved" : "Save";
+  const label = loading ? "Loading..." : busy ? "Saving..." : saved ? "Saved" : "Save";
   const accessibleLabel = saved
     ? "Remove from saved lawyers"
     : "Save lawyer";

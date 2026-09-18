@@ -1,4 +1,4 @@
-import { apiRequest } from "../../services/api.js";
+import { apiRequest, API_URL } from "../../services/api.js";
 
 export async function searchLawyers(filters, { page = 1, limit = 10 } = {}) {
   const params = new URLSearchParams();
@@ -45,5 +45,30 @@ export function getLawyersByIds(lawyerIds = []) {
   return apiRequest("/lawyers/batch", {
     method: "POST",
     body: { lawyerIds },
+  });
+}
+
+export async function uploadMyLawyerProfileImage(file, token) {
+  const response = await fetch(`${API_URL}/lawyers/me/profile-image`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": file.type || "application/octet-stream",
+    },
+    body: file,
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Unable to upload profile image.");
+  }
+
+  return data;
+}
+
+export function removeMyLawyerProfileImage(token) {
+  return apiRequest("/lawyers/me/profile-image", {
+    method: "DELETE",
+    token,
   });
 }

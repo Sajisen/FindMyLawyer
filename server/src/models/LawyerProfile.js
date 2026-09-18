@@ -43,6 +43,19 @@ const lawyerProfileSchema = new mongoose.Schema(
       trim: true,
     },
 
+    profileImageUrl: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    locationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Location",
+      default: null,
+      index: true,
+    },
+
     officeCity: {
       type: String,
       trim: true,

@@ -1,6 +1,7 @@
 export const REVIEW_REQUIRED_PROFILE_FIELDS = [
   "displayName",
   "professionalTitle",
+  "locationId",
   "officeCity",
   "district",
   "province",
@@ -20,6 +21,10 @@ export const IMMEDIATE_PROFILE_FIELDS = [
 ];
 
 function normalizeComparable(field, value) {
+  if (field === "locationId") {
+    return value ? String(value) : "";
+  }
+
   if (Array.isArray(value)) {
     const normalized = value.map((item) => String(item ?? "").trim());
 

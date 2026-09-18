@@ -56,6 +56,15 @@ async function getLocationIdForCity(city) {
   return location ? String(location._id) : "";
 }
 
+async function getSelectableLocationId(locationId, city) {
+  if (locationId) {
+    const location = await getActiveLocation({ locationId });
+    if (location) return String(location._id);
+  }
+
+  return getLocationIdForCity(city);
+}
+
 // GET LOGGED-IN LAWYER'S PROFILE
 export const getMyLawyerProfile = async (req, res) => {
   try {
@@ -73,8 +82,11 @@ export const getMyLawyerProfile = async (req, res) => {
     }
 
     const [locationId, pendingLocationId] = await Promise.all([
-      getLocationIdForCity(profile.officeCity),
-      getLocationIdForCity(profile.pendingProfileChanges?.officeCity),
+      getSelectableLocationId(profile.locationId, profile.officeCity),
+      getSelectableLocationId(
+        profile.pendingProfileChanges?.locationId,
+        profile.pendingProfileChanges?.officeCity
+      ),
     ]);
 
     return res.json({
@@ -191,6 +203,7 @@ export const updateMyLawyerProfile = async (req, res) => {
         officeCity: req.body.officeCity,
       });
 
+      validatedUpdates.locationId = location._id;
       validatedUpdates.officeCity = location.city;
       validatedUpdates.district = location.district;
       validatedUpdates.province = location.province;
@@ -242,8 +255,11 @@ export const updateMyLawyerProfile = async (req, res) => {
       await ActivityLog.create({ actor: req.user.userId, actorName: actor?.name || "Lawyer", actorRole: "lawyer", lawyer: profile._id, action: "profile_updated", previous, next: validatedUpdates });
 
       const [locationId, pendingLocationId] = await Promise.all([
-        getLocationIdForCity(profile.officeCity),
-        getLocationIdForCity(profile.pendingProfileChanges?.officeCity),
+        getSelectableLocationId(profile.locationId, profile.officeCity),
+        getSelectableLocationId(
+          profile.pendingProfileChanges?.locationId,
+          profile.pendingProfileChanges?.officeCity
+        ),
       ]);
 
       return res.json({
@@ -349,7 +365,10 @@ export const updateMyLawyerProfile = async (req, res) => {
       });
     }
 
-    const locationId = await getLocationIdForCity(profile.officeCity);
+    const locationId = await getSelectableLocationId(
+      profile.locationId,
+      profile.officeCity
+    );
 
     let message = "Lawyer profile updated successfully.";
 

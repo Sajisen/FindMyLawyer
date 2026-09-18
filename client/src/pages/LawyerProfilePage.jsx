@@ -2,18 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import SaveLawyerButton from "../features/lawyers/components/SaveLawyerButton.jsx";
+import LawyerAvatar from "../features/lawyers/components/LawyerAvatar.jsx";
 import { getLawyerById } from "../features/lawyers/lawyerApi.js";
 import useLegalCategories from "../features/search/hooks/useLegalCategories.js";
-
-function getInitials(name = "") {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-}
 
 export default function LawyerProfilePage() {
   const { id } = useParams();
@@ -152,9 +143,10 @@ export default function LawyerProfilePage() {
           <div className="relative border-b border-brand-border bg-[linear-gradient(135deg,#fffdf3_0%,#ffffff_58%)] p-6 sm:p-8 lg:p-10">
             <div className="flex flex-col gap-7 md:flex-row md:items-start md:justify-between">
               <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center">
-                <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-3xl border border-brand-yellow/30 bg-brand-yellow-soft text-3xl font-extrabold text-brand-black shadow-sm sm:h-32 sm:w-32">
-                  {getInitials(lawyer.displayName)}
-                </div>
+                <LawyerAvatar
+                  lawyer={lawyer}
+                  className="h-28 w-28 rounded-3xl text-3xl shadow-sm sm:h-32 sm:w-32"
+                />
 
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2.5">

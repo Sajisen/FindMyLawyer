@@ -33,3 +33,14 @@ export const verificationUploadLimiter = rateLimit({
       "Too many verification submissions were sent. Please wait and try again later.",
   },
 });
+
+export const profileImageUploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  keyGenerator: (req) => String(req.user.userId),
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    message: "Too many profile image changes were sent. Please wait and try again.",
+  },
+});
