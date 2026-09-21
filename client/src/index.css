@@ -2,19 +2,31 @@
 
 @theme {
   --color-brand-yellow: #f5c518;
-  --color-brand-yellow-dark: #dfae00;
-  --color-brand-yellow-soft: #fff6cc;
+  --color-brand-yellow-dark: #dba900;
+  --color-brand-yellow-soft: #fff7d6;
 
-  --color-brand-black: #111111;
-  --color-brand-dark: #242424;
+  --color-brand-black: #141414;
+  --color-brand-dark: #262626;
 
-  --color-brand-background: #fafafa;
-  --color-brand-border: #e5e5e5;
-  --color-brand-muted: #6b6b6b;
+  --color-brand-background: #f8f8f6;
+  --color-brand-border: #e7e5df;
+  --color-brand-muted: #6b6a66;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+/*
+ * Desktop density deliberately runs a little tighter than the browser default.
+ * This recreates the compact, premium feel of the site at roughly 80–90% zoom
+ * without relying on CSS `zoom`, which would distort responsive breakpoints and
+ * accessibility behavior. Browser zoom continues to work normally.
+ */
+@media (min-width: 1280px) {
+  html {
+    font-size: 15px;
+  }
 }
 
 body {
@@ -22,7 +34,7 @@ body {
   min-width: 320px;
 
   background: white;
-  color: #111111;
+  color: #141414;
 
   font-family:
     Inter,
@@ -33,6 +45,12 @@ body {
     sans-serif;
 
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: #f5c518;
+  color: #111111;
 }
 
 button,
@@ -40,4 +58,12 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
 }

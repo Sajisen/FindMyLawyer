@@ -14,6 +14,7 @@ import AccountSecurityPage from "./pages/AccountSecurityPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import RegisterLawyerPage from "./pages/RegisterLawyerPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
 import EditLawyerProfilePage from "./pages/lawyer/EditLawyerProfilePage.jsx";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage.jsx";
 
@@ -88,6 +89,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       <Footer />

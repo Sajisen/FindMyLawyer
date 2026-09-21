@@ -85,7 +85,7 @@ export default function LocationAutocomplete({
         aria-autocomplete="list"
         aria-expanded={dropdownOpen}
         aria-controls={`${id}-options`}
-        className="h-12 w-full rounded-xl border border-brand-border bg-white px-4 pr-10 text-sm text-brand-black outline-none transition placeholder:text-neutral-400 focus:border-brand-yellow-dark focus:ring-2 focus:ring-brand-yellow/20 disabled:cursor-not-allowed disabled:bg-neutral-100"
+        className="h-12 w-full rounded-xl border border-brand-border bg-white px-4 pr-10 text-sm text-brand-black shadow-[0_1px_0_rgba(17,17,17,0.02)] outline-none transition placeholder:text-neutral-400 hover:border-neutral-300 focus:border-brand-yellow-dark focus:ring-2 focus:ring-brand-yellow/20 disabled:cursor-not-allowed disabled:bg-neutral-100"
       />
 
       <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-brand-muted">
@@ -100,7 +100,7 @@ export default function LocationAutocomplete({
         <div
           id={`${id}-options`}
           role="listbox"
-          className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-brand-border bg-white py-1 shadow-xl shadow-black/10"
+          className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-[14px] border border-brand-border bg-white py-1.5 shadow-[0_18px_50px_-22px_rgba(17,17,17,0.32)]"
         >
           {error ? (
             <p className="px-4 py-3 text-sm text-red-700">{error}</p>

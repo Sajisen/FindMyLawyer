@@ -383,22 +383,22 @@ export default function FindLawyersPage() {
   return (
     <main className="min-h-screen bg-brand-background">
       <section className="border-b border-brand-border bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-7 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-extrabold tracking-tight text-brand-black sm:text-4xl">
+        <div className="mx-auto max-w-7xl px-5 py-6 sm:px-6 lg:px-8">
+          <h1 className="text-[2rem] font-extrabold tracking-[-0.035em] text-brand-black sm:text-[2.35rem]">
             Find lawyers
           </h1>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-brand-muted sm:text-base">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-brand-muted">
             Use filters to search directly, or Advanced Search if you are not
             sure which legal area fits.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)] xl:grid-cols-[340px_minmax(0,1fr)]">
+      <section className="mx-auto max-w-7xl px-5 py-7 sm:px-6 lg:px-8">
+        <div className="grid gap-5 lg:grid-cols-[310px_minmax(0,1fr)] xl:grid-cols-[325px_minmax(0,1fr)]">
           <aside className="lg:self-start">
-            <div className="rounded-2xl border border-brand-border bg-white p-5 shadow-sm lg:sticky lg:top-24">
+            <div className="rounded-[20px] border border-brand-border bg-white p-5 shadow-[0_16px_45px_-34px_rgba(17,17,17,0.32)] lg:sticky lg:top-20">
               <SearchModeTabs mode={searchMode} onChange={setSearchMode} />
 
               {searchMode === "manual" ? (
@@ -424,11 +424,11 @@ export default function FindLawyersPage() {
           </aside>
 
           <section className="min-w-0">
-            <div className="overflow-hidden rounded-2xl border border-brand-border bg-white">
-              <div className="border-b border-brand-border px-5 py-5 sm:px-6">
+            <div className="overflow-hidden rounded-[20px] border border-brand-border bg-white shadow-[0_16px_45px_-36px_rgba(17,17,17,0.28)]">
+              <div className="border-b border-brand-border px-5 py-[18px] sm:px-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 className="text-lg font-bold text-brand-black">
+                    <h2 className="text-[1.08rem] font-extrabold tracking-[-0.015em] text-brand-black">
                       Search Results
                     </h2>
 
@@ -553,8 +553,8 @@ export default function FindLawyersPage() {
                   <div
                     className={
                       viewMode === "grid"
-                        ? "grid gap-4 bg-brand-background/60 p-4 md:grid-cols-2 sm:p-6"
-                        : "space-y-4 bg-brand-background/60 p-4 sm:p-6"
+                        ? "grid gap-4 bg-brand-background/70 p-4 md:grid-cols-2 sm:p-5"
+                        : "space-y-4 bg-brand-background/70 p-4 sm:p-5"
                     }
                   >
                     {lawyers.map((lawyer) => (

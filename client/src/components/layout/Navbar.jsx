@@ -61,27 +61,27 @@ export default function Navbar() {
   }
 
   const navLinkClass = ({ isActive }) =>
-    `text-sm font-medium transition-colors ${
+    `text-[13px] font-semibold transition-colors ${
       isActive
         ? "text-brand-black"
         : "text-brand-muted hover:text-brand-black"
     }`;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-brand-border bg-white/95 backdrop-blur">
-      <div className="relative mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
-        <Link to="/" onClick={closeMenu} className="flex items-center gap-3">
+    <header className="sticky top-0 z-50 border-b border-brand-border bg-white/90 shadow-[0_1px_0_rgba(17,17,17,0.02)] backdrop-blur-xl">
+      <div className="relative mx-auto flex h-[64px] max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
+        <Link to="/" onClick={closeMenu} className="flex items-center gap-2.5">
           <img
             src={logoIcon}
             alt="FindMyLawyer"
-            className="h-10 w-10 rounded-xl object-contain"
+            className="h-9 w-9 rounded-[11px] object-contain"
           />
-          <span className="text-lg font-extrabold tracking-tight text-brand-black">
+          <span className="text-[1.05rem] font-extrabold tracking-[-0.025em] text-brand-black">
             FindMyLawyer
           </span>
         </Link>
 
-        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 md:flex">
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 md:flex">
           <NavLink to="/" end className={navLinkClass}>
             Home
           </NavLink>
@@ -100,7 +100,7 @@ export default function Navbar() {
                   : "Saved lawyers"
               }
               title="Saved lawyers"
-              className="relative flex h-10 w-10 items-center justify-center rounded-full text-brand-muted transition hover:bg-brand-background hover:text-brand-black"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full text-brand-muted transition hover:bg-brand-background hover:text-brand-black"
             >
               <HeartIcon />
               {savedCount > 0 && (
@@ -118,12 +118,12 @@ export default function Navbar() {
                 onClick={() => setAccountOpen((previous) => !previous)}
                 aria-expanded={accountOpen}
                 aria-haspopup="menu"
-                className="flex items-center gap-2 rounded-full border border-brand-border bg-white p-1.5 pr-3 transition hover:bg-brand-background"
+                className="flex items-center gap-2 rounded-full border border-brand-border bg-white p-1 pr-2.5 shadow-sm transition hover:border-neutral-300 hover:bg-brand-background"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-yellow-soft text-xs font-extrabold text-brand-black">
+                <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-brand-yellow-soft text-[11px] font-extrabold text-brand-black">
                   {getInitials(user.name)}
                 </span>
-                <span className="hidden max-w-32 truncate text-sm font-semibold text-brand-black lg:block">
+                <span className="hidden max-w-32 truncate text-[13px] font-semibold text-brand-black lg:block">
                   {user.name}
                 </span>
                 <ChevronIcon />
@@ -132,7 +132,7 @@ export default function Navbar() {
               {accountOpen && (
                 <div
                   role="menu"
-                  className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-brand-border bg-white p-2 shadow-xl shadow-black/10"
+                  className="absolute right-0 mt-2 w-64 overflow-hidden rounded-[18px] border border-brand-border bg-white p-2 shadow-[0_22px_60px_-25px_rgba(17,17,17,0.32)]"
                 >
                   <div className="border-b border-brand-border px-3 py-3">
                     <p className="truncate text-sm font-bold text-brand-black">
@@ -162,6 +162,18 @@ export default function Navbar() {
                       <LockIcon />
                       Sign-in & security
                     </Link>
+
+                    {user.role === "lawyer" && (
+                      <Link
+                        to="/lawyer/verification"
+                        role="menuitem"
+                        onClick={closeMenu}
+                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-brand-black transition hover:bg-brand-background"
+                      >
+                        <VerificationIcon />
+                        Verification
+                      </Link>
+                    )}
 
                     {user.role === "admin" && (
                       <Link
@@ -194,13 +206,13 @@ export default function Navbar() {
             <>
               <Link
                 to="/login"
-                className="rounded-lg px-4 py-2.5 text-sm font-semibold text-brand-black transition hover:bg-brand-background"
+                className="rounded-lg px-3.5 py-2 text-[13px] font-semibold text-brand-black transition hover:bg-brand-background"
               >
                 Sign in
               </Link>
               <Link
                 to="/register"
-                className="rounded-xl bg-brand-black px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-dark"
+                className="rounded-xl bg-brand-black px-[18px] py-2 text-[13px] font-semibold text-white shadow-sm transition hover:-translate-y-px hover:bg-brand-dark"
               >
                 Register
               </Link>
@@ -252,6 +264,11 @@ export default function Navbar() {
                 <MobileNavLink to="/account-security" onClick={closeMenu}>
                   Sign-in & security
                 </MobileNavLink>
+                {user.role === "lawyer" && (
+                  <MobileNavLink to="/lawyer/verification" onClick={closeMenu}>
+                    Verification
+                  </MobileNavLink>
+                )}
                 {user.role === "admin" && (
                   <MobileNavLink to="/admin" onClick={closeMenu}>
                     Admin panel
@@ -335,6 +352,15 @@ function LockIcon() {
     <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
       <rect x="6" y="10" width="12" height="9" rx="2" stroke="currentColor" strokeWidth="1.6" />
       <path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function VerificationIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
+      <path d="M12 3.5 18.5 6v5.2c0 4-2.4 7-6.5 9.3-4.1-2.3-6.5-5.3-6.5-9.3V6L12 3.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="m9.3 12 1.7 1.7 3.8-4.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

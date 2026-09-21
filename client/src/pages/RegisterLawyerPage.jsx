@@ -9,6 +9,7 @@ import {
   languages,
 } from "../features/search/data/searchOptions.js";
 import SelectControl from "../components/ui/SelectControl.jsx";
+import PasswordField from "../components/ui/PasswordField.jsx";
 
 const initialForm = {
   name: "",
@@ -33,19 +34,7 @@ const initialForm = {
 
 const accountFields = [
   { name: "name", label: "Full name", autoComplete: "name" },
-  { name: "email", label: "Email", type: "email", autoComplete: "email" },
-  {
-    name: "password",
-    label: "Password",
-    type: "password",
-    autoComplete: "new-password",
-  },
-  {
-    name: "confirmPassword",
-    label: "Confirm password",
-    type: "password",
-    autoComplete: "new-password",
-  },
+  { name: "email", label: "Sign-in email", type: "email", autoComplete: "email" },
   { name: "displayName", label: "Public display name" },
   { name: "professionalTitle", label: "Professional title" },
   { name: "phone", label: "Contact phone", type: "tel", autoComplete: "tel" },
@@ -142,11 +131,8 @@ export default function RegisterLawyerPage() {
                 Account and public details
               </h2>
               <div className="mt-5 grid gap-5 sm:grid-cols-2">
-                {accountFields.map((field) => (
-                  <label
-                    key={field.name}
-                    className={field.name === "phone" ? "block" : "block"}
-                  >
+                {accountFields.slice(0, 2).map((field) => (
+                  <label key={field.name} className="block">
                     <span className="text-sm font-semibold text-brand-black">
                       {field.label}
                     </span>
@@ -156,9 +142,53 @@ export default function RegisterLawyerPage() {
                       autoComplete={field.autoComplete}
                       value={form[field.name]}
                       onChange={(event) => update(field.name, event.target.value)}
-                      minLength={field.name === "password" ? 8 : undefined}
                       required
-                      className="mt-2 h-12 w-full rounded-xl border border-brand-border px-4 text-sm outline-none transition focus:border-brand-yellow-dark focus:ring-2 focus:ring-brand-yellow/20"
+                      disabled={submitting}
+                      className="mt-2 h-11 w-full rounded-xl border border-brand-border px-4 text-sm outline-none transition hover:border-neutral-300 focus:border-brand-yellow-dark focus:ring-2 focus:ring-brand-yellow/20 disabled:bg-neutral-50"
+                    />
+                  </label>
+                ))}
+
+                <PasswordField
+                  label="Password"
+                  hint="8+ characters"
+                  value={form.password}
+                  onChange={(event) => update("password", event.target.value)}
+                  minLength={8}
+                  autoComplete="new-password"
+                  disabled={submitting}
+                />
+                <PasswordField
+                  label="Confirm password"
+                  value={form.confirmPassword}
+                  onChange={(event) => update("confirmPassword", event.target.value)}
+                  minLength={8}
+                  autoComplete="new-password"
+                  disabled={submitting}
+                />
+
+                {form.confirmPassword && (
+                  <p className={`text-xs font-semibold sm:col-span-2 ${form.password === form.confirmPassword ? "text-emerald-700" : "text-red-600"}`}>
+                    {form.password === form.confirmPassword
+                      ? "Passwords match."
+                      : "Passwords do not match yet."}
+                  </p>
+                )}
+
+                {accountFields.slice(2).map((field) => (
+                  <label key={field.name} className={field.name === "phone" ? "block sm:col-span-2" : "block"}>
+                    <span className="text-sm font-semibold text-brand-black">
+                      {field.label}
+                    </span>
+                    <input
+                      name={field.name}
+                      type={field.type || "text"}
+                      autoComplete={field.autoComplete}
+                      value={form[field.name]}
+                      onChange={(event) => update(field.name, event.target.value)}
+                      required
+                      disabled={submitting}
+                      className="mt-2 h-11 w-full rounded-xl border border-brand-border px-4 text-sm outline-none transition hover:border-neutral-300 focus:border-brand-yellow-dark focus:ring-2 focus:ring-brand-yellow/20 disabled:bg-neutral-50"
                     />
                   </label>
                 ))}

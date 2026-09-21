@@ -60,7 +60,7 @@ export default function LawyerCard({
     const remainingAreaCount = Math.max(0, practiceAreas.length - visibleAreas.length);
 
     return (
-      <article className="group flex min-h-[390px] flex-col rounded-2xl border border-brand-border bg-white p-5 transition duration-200 hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-lg hover:shadow-black/[0.04] sm:p-6">
+      <article className="group flex min-h-[380px] flex-col rounded-[20px] border border-brand-border bg-white p-5 shadow-[0_1px_0_rgba(17,17,17,0.02)] transition duration-300 hover:-translate-y-1 hover:border-[#ddd7c7] hover:shadow-[0_22px_50px_-30px_rgba(17,17,17,0.36)] sm:p-[22px]">
         <div className="flex items-start justify-between gap-4">
           <LawyerAvatar lawyer={lawyer} />
           <SaveLawyerButton lawyer={lawyer} iconOnly />
@@ -144,7 +144,7 @@ export default function LawyerCard({
   }
 
   return (
-    <article className="group rounded-2xl border border-brand-border bg-white p-5 transition duration-200 hover:border-neutral-300 hover:shadow-lg hover:shadow-black/[0.035] sm:p-6">
+    <article className="group rounded-[20px] border border-brand-border bg-white p-5 shadow-[0_1px_0_rgba(17,17,17,0.02)] transition duration-300 hover:border-[#ddd7c7] hover:shadow-[0_22px_50px_-30px_rgba(17,17,17,0.32)] sm:p-[22px]">
       <div className="flex flex-col gap-5 sm:flex-row">
         <LawyerAvatar lawyer={lawyer} />
 
@@ -229,7 +229,7 @@ export default function LawyerCard({
               lawyer={lawyer}
               returnTo={returnTo}
               onOpenProfile={onOpenProfile}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-yellow-soft px-4 py-2.5 text-sm font-bold text-brand-black transition hover:bg-[#ffed9b]"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-yellow-soft px-4 py-2.5 text-sm font-bold text-brand-black transition hover:-translate-y-px hover:bg-[#ffed9b]"
             >
               View profile
               <span aria-hidden="true">→</span>
